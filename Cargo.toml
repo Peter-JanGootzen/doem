@@ -1,0 +1,13 @@
+[package]
+name = "doem"
+version = "0.1.0"
+authors = ["Peter-Jan Gootzen <peterjan@gootzen.net>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rusty-linear-algebra = { path = "../rusty-linear-algebra" }
+luminance = "0.37.1"
+luminance-derive = "0.5.0"
+luminance-glfw = "0.11.0"
