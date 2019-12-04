@@ -30,7 +30,7 @@ dependencies = [
  "luminance 0.37.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "luminance-derive 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "luminance-glfw 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "rusty-linear-algebra 0.1.0",
+ "rusty-linear-algebra 0.1.0 (git+https://github.com/Peter-JanGootzen/rusty-linear-algebra)",
 ]
 
 [[package]]
@@ -145,6 +145,7 @@ dependencies = [
 [[package]]
 name = "rusty-linear-algebra"
 version = "0.1.0"
+source = "git+https://github.com/Peter-JanGootzen/rusty-linear-algebra#8c04bb6536a71c6cf2b107ed0bdd7c1b6af8d6a5"
 dependencies = [
  "staticvec 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -205,6 +206,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum luminance-windowing 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "57f9cc14b7649a1e202cd2ecc39f2ec5b8b10cf073207502b9f8265d1b6db4ca"
 "checksum proc-macro2 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)" = "9c9e470a8dc4aeae2dee2f335e8f533e2d4b347e1434e5671afc49b054592f27"
 "checksum quote 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "053a8c8bcc71fcce321828dc897a98ab9760bef03a4fc36693c231e5b3216cfe"
+"checksum rusty-linear-algebra 0.1.0 (git+https://github.com/Peter-JanGootzen/rusty-linear-algebra)" = "<none>"
 "checksum semver 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1d7eb9ef2c18661902cc47e535f9bc51b78acd254da71d375c2f6720d9a40403"
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 "checksum staticvec 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d188772db33b3eef453faab26e780ba6322ac4118899a679b22f1a1fc2f2bcb9"
