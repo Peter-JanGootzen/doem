@@ -1,0 +1,25 @@
+name: Rust
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install default nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: default
+        toolchain: nightly-2019-11-24
+        override: true
+    - name: Build
+      run: cargo build --verbose
+    - name: Clippy
+      run: cargo clippy
+    - name: Run tests
+      run: cargo test --verbose
+
