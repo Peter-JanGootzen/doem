@@ -15,11 +15,11 @@ const FS: &str = include_str!("displacement-fs.glsl");
 const COORDINATE_SYSTEM_X_UPPER: [Vertex; 22] = [
     Vertex {
         pos: GLVertex::new([1.0, 0.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
+        rgb: GLVertexColor::new([0., 0., 1.]),
     },
     Vertex {
         pos: GLVertex::new([-1.0, 0.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
+        rgb: GLVertexColor::new([0., 0., 1.]),
     },
     Vertex {
         pos: GLVertex::new([1.0, 0.1]),
@@ -102,7 +102,7 @@ const COORDINATE_SYSTEM_X_UPPER: [Vertex; 22] = [
         rgb: GLVertexColor::new([0., 1., 0.]),
     },
 ];
-const COORDINATE_SYSTEM_X_LOWER: [Vertex; 20] = [
+const COORDINATE_SYSTEM_X_LOWER: [Vertex; 18] = [
     Vertex {
         pos: GLVertex::new([1.0, -0.1]),
         rgb: GLVertexColor::new([0., 1., 0.]),
@@ -175,23 +175,15 @@ const COORDINATE_SYSTEM_X_LOWER: [Vertex; 20] = [
         pos: GLVertex::new([-1.0, -0.9]),
         rgb: GLVertexColor::new([0., 1., 0.]),
     },
-    Vertex {
-        pos: GLVertex::new([1.0, -1.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
-    },
-    Vertex {
-        pos: GLVertex::new([-1.0, -1.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
-    },
 ];
-const COORDINATE_SYSTEM_Y_UPPER: [Vertex; 22] = [
+const COORDINATE_SYSTEM_Y_UPPER: [Vertex; 20] = [
     Vertex {
         pos: GLVertex::new([0.0, 1.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
+        rgb: GLVertexColor::new([0., 0., 1.]),
     },
     Vertex {
         pos: GLVertex::new([0.0, -1.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
+        rgb: GLVertexColor::new([0., 0., 1.]),
     },
     Vertex {
         pos: GLVertex::new([0.1, 1.0]),
@@ -265,16 +257,8 @@ const COORDINATE_SYSTEM_Y_UPPER: [Vertex; 22] = [
         pos: GLVertex::new([0.9, -1.0]),
         rgb: GLVertexColor::new([0., 1., 0.]),
     },
-    Vertex {
-        pos: GLVertex::new([1.0, 1.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
-    },
-    Vertex {
-        pos: GLVertex::new([1.0, -1.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
-    },
 ];
-const COORDINATE_SYSTEM_Y_LOWER: [Vertex; 20] = [
+const COORDINATE_SYSTEM_Y_LOWER: [Vertex; 18] = [
     Vertex {
         pos: GLVertex::new([-0.1, 1.0]),
         rgb: GLVertexColor::new([0., 1., 0.]),
@@ -347,32 +331,19 @@ const COORDINATE_SYSTEM_Y_LOWER: [Vertex; 20] = [
         pos: GLVertex::new([-0.9, -1.0]),
         rgb: GLVertexColor::new([0., 1., 0.]),
     },
-    Vertex {
-        pos: GLVertex::new([-1.0, 1.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
-    },
-    Vertex {
-        pos: GLVertex::new([-1.0, -1.0]),
-        rgb: GLVertexColor::new([0., 1., 0.]),
-    },
 ];
 
-// Only one triangle this time.
-const VERTICES: [Vertex; 4] = [
+const VERTICES: [Vertex; 3] = [
     Vertex {
-        pos: GLVertex::new([0.0, 0.0]),
+        pos: GLVertex::new([0.3, -0.3]),
         rgb: GLVertexColor::new([1., 0., 0.]),
     },
     Vertex {
-        pos: GLVertex::new([0.3, 0.5]),
+        pos: GLVertex::new([-0.3, -0.3]),
         rgb: GLVertexColor::new([1., 0., 0.]),
     },
     Vertex {
-        pos: GLVertex::new([0.0, 0.0]),
-        rgb: GLVertexColor::new([1., 0., 0.]),
-    },
-    Vertex {
-        pos: GLVertex::new([0.5, 0.3]),
+        pos: GLVertex::new([0.0, 0.3]),
         rgb: GLVertexColor::new([1., 0., 0.]),
     },
 ];
@@ -401,7 +372,7 @@ fn main() {
 
     let shape = TessBuilder::new(&mut surface)
         .add_vertices(VERTICES)
-        .set_mode(Mode::Line)
+        .set_mode(Mode::Triangle)
         .build()
         .unwrap();
 
@@ -505,12 +476,12 @@ fn main() {
                 shd_gate.shade(&program, |iface, mut rdr_gate| {
                     // update the time and triangle position on the GPU shader program
                     rdr_gate.render(RenderState::default(), |mut tess_gate| {
-                        iface.transform.update(transform.copy_to_array());
+                        iface.transform.update(transform.transpose().copy_to_array());
                         tess_gate.render(&shape);
                     });
 
                     rdr_gate.render(RenderState::default(), |mut tess_gate| {
-                        iface.transform.update(identity.copy_to_array());
+                        iface.transform.update(identity.transpose().copy_to_array());
                         tess_gate.render(&coordinate_system_x_upper);
                         tess_gate.render(&coordinate_system_x_lower);
                         tess_gate.render(&coordinate_system_y_lower);
