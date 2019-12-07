@@ -13,6 +13,10 @@ use luminance::render_state::RenderState;
 use luminance::shader::program::Program;
 use luminance_glfw::{Action, GlfwSurface, Key, Surface, WindowDim, WindowEvent, WindowOpt};
 use luminance::tess::TessSlice;
+use ::imgui::Context as ImContext;
+use imgui_glfw_rs::glfw;
+use imgui_glfw_rs::imgui;
+use imgui_glfw_rs::ImguiGLFW;
 use rusty_linear_algebra::vector_space::{ Matrix4, PI };
 use cgmath;
 use cgmath::EuclideanSpace;
@@ -53,6 +57,9 @@ fn start(model_path: &Path) {
     )
     .expect("GLFW surface creation");
 
+    let mut imgui = ImContext::create();
+    let mut imgui_glfw = ImguiGLFW::new(&mut imgui, &mut *surface.get_window());
+
     // see the use of our uniform interface here as thirds type variable
     let program = Program::<VertexSemantics, (), ShaderInterface>::from_strings(None, VS, None, FS)
         .expect("program creation")
@@ -71,6 +78,7 @@ fn start(model_path: &Path) {
 
     'app: loop {
         for event in surface.poll_events() {
+            imgui_glfw.handle_event(&mut imgui, &event);
             match event {
                 WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => {
                     break 'app
@@ -157,6 +165,11 @@ fn start(model_path: &Path) {
                     });
                 });
             });
+
+        let ui = imgui_glfw.frame(&mut *surface.get_window(), &mut imgui);
+        ui.show_demo_window(&mut true);
+        imgui_glfw.draw(ui, &mut *surface.get_window());
+
         surface.swap_buffers();
     }
 }

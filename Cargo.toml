@@ -10,7 +10,10 @@ edition = "2018"
 rusty-linear-algebra = { path = "../rusty-linear-algebra" }
 luminance = "0.37.1"
 luminance-derive = "0.5.0"
-luminance-glfw = "0.11.0"
+luminance-glfw = { path = "../luminance-rs/luminance-glfw" }
+imgui = "0.1.0"
+imgui-opengl-renderer = "0.5.0"
+imgui-glfw-rs = "0.4.1"
 wavefront_obj = "2.0.4"
 try-guard = "0.2.0"
 cgmath = "0.17.0"
