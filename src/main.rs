@@ -427,7 +427,8 @@ fn main() {
         .unwrap();
 
     let mut back_buffer = surface.back_buffer().unwrap();
-
+    
+    let mut angle = 0.5;
     let identity = Matrix4::identity();
     let mut translation = Matrix4::identity();
     let mut scale = Matrix4::identity();
@@ -481,6 +482,16 @@ fn main() {
                     scale.data[0][0] -= 0.1;
                     scale.data[1][1] -= 0.1;
                 }
+                WindowEvent::Key(Key::Q, _, action, _)
+                    if action == Action::Press || action == Action::Repeat =>
+                {
+                    angle -= 0.05;
+                }
+                WindowEvent::Key(Key::E, _, action, _)
+                    if action == Action::Press || action == Action::Repeat =>
+                {
+                    angle += 0.05;
+                }
 
                 WindowEvent::FramebufferSize(..) => {
                     resize = true;
@@ -495,7 +506,8 @@ fn main() {
             resize = false;
         }
 
-        let transform = &translation * &scale;
+        let mut rotation = Matrix4::new_2d_rotation(angle);
+        let transform = &(&translation * &scale) * &rotation;
         println!("{}", transform);
 
         surface
