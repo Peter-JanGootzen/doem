@@ -1,12 +1,13 @@
-in vec2 vertex;
+in vec3 pos;
 in vec3 color;
 
 out vec3 v_color;
 
 uniform mat4 transform;
+uniform mat4 projection;
+uniform mat4 view;
 
 void main() {
-  vec4 transformed_vertex =  transform * vec4(vertex, 1.0f, 1.0f);
-  gl_Position = vec4(transformed_vertex.x, transformed_vertex.y, 0.0f, 1.0f);
+  gl_Position = projection * view * transform * vec4(pos, 1.0f);
   v_color = color;
 }
