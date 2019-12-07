@@ -1,22 +1,18 @@
 mod gl_common;
+mod obj_loader;
 
-use crate::gl_common::{Vertex, VertexColor, VertexSemantics, VertexPosition};
+use crate::gl_common::{VertexSemantics, ShaderInterface};
+use crate::obj_loader::ObjLoader;
 
-use std::fs::File;
-use std::path::Path;
-use std::io::Read;
-use std::collections::HashMap;
+use clap::{Arg, App, SubCommand};
 use luminance::context::GraphicsContext;
 use luminance::render_state::RenderState;
-use luminance::shader::program::{Program, Uniform};
-use luminance::tess::{Mode, Tess, TessBuilder, TessError, TessSliceIndex};
-use luminance_derive::UniformInterface;
+use luminance::shader::program::Program;
 use luminance_glfw::{Action, GlfwSurface, Key, Surface, WindowDim, WindowEvent, WindowOpt};
+use luminance::tess::TessSliceIndex;
 use rusty_linear_algebra::vector_space::{ Matrix4, PI };
 use cgmath;
 use cgmath::EuclideanSpace;
-use wavefront_obj::{obj};
-use try_guard::verify;
 
 const VS: &str = include_str!("displacement-vs.glsl");
 const FS: &str = include_str!("displacement-fs.glsl");
@@ -25,88 +21,20 @@ const FOVY: cgmath::Rad<f32> = cgmath::Rad(PI / 2.0);
 const Z_NEAR: f32 = 0.1;
 const Z_FAR: f32 = 10.;
 
-// Create a uniform interface. This is a type that will be used to customize the shader. In our
-// case, we just want to pass the time and the position of the triangle, for instance.
-//
-// This macro only supports structs for now; you cannot use enums as uniform interfaces.
-#[derive(Debug, UniformInterface)]
-struct ShaderInterface {
-    transform: Uniform<[[f32; 4]; 4]>,
-    #[uniform(unbound)]
-    projection: Uniform<[[f32; 4]; 4]>,
-    #[uniform(unbound)]
-    view: Uniform<[[f32; 4]; 4]>,
-}
-
-type VertexIndex = u32;
-
-struct Obj {
-    vertices: Vec<Vertex>,
-    indices: Vec<VertexIndex>
-}
-impl Obj {
-    fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError> where C: GraphicsContext {
-      TessBuilder::new(ctx)
-        .set_mode(Mode::Triangle)
-        .add_vertices(self.vertices)
-        .set_indices(self.indices)
-        .build()
-    }
-    pub fn load<P>(path: P) -> Result<Self, String> where P: AsRef<Path> {
-        let file_content = {
-          let mut file = File::open(path).map_err(|e| format!("cannot open file: {}", e))?;
-          let mut content = String::new();
-          file.read_to_string(&mut content);
-          content
-        };
-        let obj_set = obj::parse(file_content).map_err(|e| format!("cannot parse: {:?}", e))?;
-        let objects = obj_set.objects;
-
-        verify!(objects.len() == 1).ok_or("expecting a single object".to_owned())?;
-
-        let object = objects.into_iter().next().unwrap();
-
-        verify!(object.geometry.len() == 1).ok_or("expecting a single geometry".to_owned())?;
-
-        let geometry = object.geometry.into_iter().next().unwrap();
-
-        println!("loading {}", object.name);
-        println!("{} vertices", object.vertices.len());
-        println!("{} shapes", geometry.shapes.len());
-
-        // build up vertices; for this to work, we remove duplicated vertices by putting them in a
-        // map associating the vertex with its ID
-        let mut vertex_cache: HashMap<obj::VTNIndex, VertexIndex> = HashMap::new();
-        let mut vertices: Vec<Vertex> = Vec::new();
-        let mut indices: Vec<VertexIndex> = Vec::new();
-        for shape in geometry.shapes {
-          if let obj::Shape::Triangle(a, b, c) = shape {
-            for key in &[a, b, c] {
-              if let Some(vertex_index) = vertex_cache.get(key) {
-                indices.push(*vertex_index);
-              } else {
-                let p = object.vertices[key.0];
-                let vertex = Vertex {
-                    pos: VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]),
-                    color: VertexColor::new([1.0, 1.0, 0.0 ])
-                };
-                let vertex_index = vertices.len() as VertexIndex;
-
-                vertex_cache.insert(*key, vertex_index);
-                vertices.push(vertex);
-                indices.push(vertex_index);
-              }
-            }
-          } else {
-            return Err("unsupported non-triangle shape".to_owned());
-          }
-        }
-
-        Ok(Obj { vertices, indices })
-    }
-}
-
 fn main() {
+    let matches = App::new("Rusty obj viewer")
+                          .version("1.0")
+                          .author("Bram-Boris Meerlo and Peter-Jan Gootzen")
+                          .about("Made using our own linear algebra crate rusty_linear_algebra.")
+                          .arg(Arg::with_name("model_path")
+                               .short("m")
+                               .long("model")
+                               .value_name("MODEL_PATH")
+                               .help("Sets the wavefront obj model that is going to be loaded")
+                               .required(true)
+                               .takes_value(true))
+                          .get_matches();
+
     let mut surface = GlfwSurface::new(
         WindowDim::Windowed(960, 540),
         "Hello, world!",
@@ -126,7 +54,8 @@ fn main() {
     let mut translation = Matrix4::identity();
     let mut scale = Matrix4::identity();
 
-    let shape = Obj::load("suzanne.obj").unwrap();
+    let model_path = matches.value_of("model_path").unwrap();
+    let shape = ObjLoader::load("/home/peter-jan/Models/suzanne.obj").unwrap();
     let shape_tess = shape.to_tess(&mut surface).unwrap();
 
     let projection = cgmath::perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
