@@ -1,15 +1,18 @@
 mod gl_common;
 mod obj_loader;
+mod shape;
 
 use crate::gl_common::{VertexSemantics, ShaderInterface};
 use crate::obj_loader::ObjLoader;
+use crate::shape::Shape;
 
+use std::path::Path;
 use clap::{Arg, App};
 use luminance::context::GraphicsContext;
 use luminance::render_state::RenderState;
 use luminance::shader::program::Program;
 use luminance_glfw::{Action, GlfwSurface, Key, Surface, WindowDim, WindowEvent, WindowOpt};
-use luminance::tess::TessSliceIndex;
+use luminance::tess::TessSlice;
 use rusty_linear_algebra::vector_space::{ Matrix4, PI };
 use cgmath;
 use cgmath::EuclideanSpace;
@@ -36,12 +39,13 @@ fn main() {
                                .takes_value(true))
                           .get_matches();
 
-    let model_path = matches.value_of("model_path").unwrap();
+    let model_path_str = matches.value_of("model_path").unwrap();
+    let model_path = Path::new(model_path_str);
 
-    start(model_path);
+    start(&model_path);
 }
 
-fn start(model_path: &str) {
+fn start(model_path: &Path) {
     let mut surface = GlfwSurface::new(
         WindowDim::Windowed(960, 540),
         "Hello, world!",
@@ -56,13 +60,9 @@ fn start(model_path: &str) {
 
     let mut back_buffer = surface.back_buffer().unwrap();
     
-    let mut angle = 0.0;
-    let identity = Matrix4::identity();
-    let mut translation = Matrix4::identity();
-    let mut scale = Matrix4::identity();
-
-    let shape = ObjLoader::load(model_path).unwrap();
-    let shape_tess = shape.to_tess(&mut surface).unwrap();
+    let shape_obj = ObjLoader::load(model_path).unwrap();
+    let shape_tess = shape_obj.to_tess(&mut surface).unwrap();
+    let mut shape = Shape::new(shape_tess);
 
     let projection = cgmath::perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
     let view = cgmath::Matrix4::<f32>::look_at(cgmath::Point3::new(2., 2., 2.), cgmath::Point3::origin(), cgmath::Vector3::unit_y());
@@ -80,51 +80,51 @@ fn start(model_path: &str) {
                 | WindowEvent::Key(Key::Left, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    translation.data[0][3] += -0.01;
+                    shape.position.data[0][3] += -0.01;
                 }
 
                 WindowEvent::Key(Key::D, _, action, _)
                 | WindowEvent::Key(Key::Right, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    translation.data[0][3] += 0.01;
+                    shape.position.data[0][3] += 0.01;
                 }
 
                 WindowEvent::Key(Key::W, _, action, _)
                 | WindowEvent::Key(Key::Up, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    translation.data[1][3] += 0.01;
+                    shape.position.data[1][3] += 0.01;
                 }
 
                 WindowEvent::Key(Key::S, _, action, _)
                 | WindowEvent::Key(Key::Down, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    translation.data[1][3] += -0.01;
+                    shape.position.data[1][3] += -0.01;
                 }
 
                 WindowEvent::Key(Key::K, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    scale.data[0][0] += 0.1;
-                    scale.data[1][1] += 0.1;
+                    shape.scaling.data[0][0] += 0.1;
+                    shape.scaling.data[1][1] += 0.1;
                 }
                 WindowEvent::Key(Key::J, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    scale.data[0][0] -= 0.1;
-                    scale.data[1][1] -= 0.1;
+                    shape.scaling.data[0][0] -= 0.1;
+                    shape.scaling.data[1][1] -= 0.1;
                 }
                 WindowEvent::Key(Key::Q, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    angle -= 0.05;
+                    shape.rotate(-0.05);
                 }
                 WindowEvent::Key(Key::E, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    angle += 0.05;
+                    shape.rotate(0.05);
                 }
 
                 WindowEvent::FramebufferSize(..) => {
@@ -140,10 +140,6 @@ fn start(model_path: &str) {
             resize = false;
         }
 
-        let rotation = Matrix4::new_2d_rotation(angle);
-        let transform = &(&translation * &scale) * &rotation;
-        println!("{}", transform);
-
         surface
             .pipeline_builder()
             .pipeline(&back_buffer, [1., 0., 0., 0.], |_, mut shd_gate| {
@@ -151,14 +147,11 @@ fn start(model_path: &str) {
                 shd_gate.shade(&program, |iface, mut rdr_gate| {
                     iface.projection.update(projection.into());
                     iface.view.update(view.into());
-                    // update the time and triangle position on the GPU shader program
-                    rdr_gate.render(RenderState::default(), |mut tess_gate| {
-                        iface.transform.update(transform.transpose().copy_to_array());
-                        tess_gate.render(shape_tess.slice(..));
-                    });
 
                     rdr_gate.render(RenderState::default(), |mut tess_gate| {
-                        iface.transform.update(identity.transpose().copy_to_array());
+                        iface.transform.update(shape.get_transformation()
+                            .transpose().copy_to_array());
+                        tess_gate.render(TessSlice::one_whole(shape.get_tess()));
                     });
                 });
             });
