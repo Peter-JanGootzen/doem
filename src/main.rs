@@ -47,7 +47,7 @@ fn main() {
 
 fn start(model_path: &Path) {
     let mut surface = GlfwSurface::new(
-        WindowDim::Windowed(960, 540),
+        WindowDim::Windowed(1600, 900),
         "Hello, world!",
         WindowOpt::default(),
     )
@@ -109,12 +109,14 @@ fn start(model_path: &Path) {
                 {
                     shape.scaling.data[0][0] += 0.1;
                     shape.scaling.data[1][1] += 0.1;
+                    shape.scaling.data[2][2] += 0.1;
                 }
                 WindowEvent::Key(Key::J, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
                     shape.scaling.data[0][0] -= 0.1;
                     shape.scaling.data[1][1] -= 0.1;
+                    shape.scaling.data[2][2] -= 0.1;
                 }
                 WindowEvent::Key(Key::Q, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
