@@ -23,7 +23,7 @@ impl Shape {
         &self.tess
     }
     pub fn get_transformation(&self) -> Matrix4 {
-        &(&self.rotation_matrix * &self.scaling) * &self.position
+        &(&self.position * &self.scaling) * &self.rotation_matrix
     }
     pub fn set_rotation(&mut self, angle: Scalar) {
         self.rotation_matrix = Matrix4::new_2d_rotation(angle);
