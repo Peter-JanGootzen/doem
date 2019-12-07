@@ -4,7 +4,7 @@ mod obj_loader;
 use crate::gl_common::{VertexSemantics, ShaderInterface};
 use crate::obj_loader::ObjLoader;
 
-use clap::{Arg, App, SubCommand};
+use clap::{Arg, App};
 use luminance::context::GraphicsContext;
 use luminance::render_state::RenderState;
 use luminance::shader::program::Program;
@@ -31,10 +31,17 @@ fn main() {
                                .long("model")
                                .value_name("MODEL_PATH")
                                .help("Sets the wavefront obj model that is going to be loaded")
+                               .index(1)
                                .required(true)
                                .takes_value(true))
                           .get_matches();
 
+    let model_path = matches.value_of("model_path").unwrap();
+
+    start(model_path);
+}
+
+fn start(model_path: &str) {
     let mut surface = GlfwSurface::new(
         WindowDim::Windowed(960, 540),
         "Hello, world!",
@@ -54,8 +61,7 @@ fn main() {
     let mut translation = Matrix4::identity();
     let mut scale = Matrix4::identity();
 
-    let model_path = matches.value_of("model_path").unwrap();
-    let shape = ObjLoader::load("/home/peter-jan/Models/suzanne.obj").unwrap();
+    let shape = ObjLoader::load(model_path).unwrap();
     let shape_tess = shape.to_tess(&mut surface).unwrap();
 
     let projection = cgmath::perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
@@ -134,7 +140,7 @@ fn main() {
             resize = false;
         }
 
-        let mut rotation = Matrix4::new_2d_rotation(angle);
+        let rotation = Matrix4::new_2d_rotation(angle);
         let transform = &(&translation * &scale) * &rotation;
         println!("{}", transform);
 
