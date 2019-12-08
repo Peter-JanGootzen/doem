@@ -2,7 +2,7 @@ use rusty_linear_algebra::vector_space::{ Matrix4, Scalar };
 use luminance::tess::Tess;
 
 pub struct Shape {
-    pub tess: Tess,
+    pub tesselations: Vec<Tess>,
     pub position: Matrix4,
     pub rotation_matrix_x: Matrix4,
     pub rotation_matrix_y: Matrix4,
@@ -14,9 +14,9 @@ pub struct Shape {
 }
 
 impl Shape {
-    pub fn new(tess: Tess) -> Shape {
+    pub fn new(tesselations: Vec<Tess>) -> Shape {
         Shape {
-            tess,
+            tesselations,
             position: Matrix4::identity(),
             rotation_matrix_x: Matrix4::identity(),
             rotation_matrix_y: Matrix4::identity(),
@@ -27,8 +27,8 @@ impl Shape {
             scaling: Matrix4::identity(),
         }
     }
-    pub fn get_tess(&self) -> &Tess {
-        &self.tess
+    pub fn get_tesselations(&self) -> &Vec<Tess> {
+        &self.tesselations
     }
     pub fn get_transformation(&self) -> Matrix4 {
         let mut m4 = &(&self.position * &self.scaling) * &self.rotation_matrix_x;

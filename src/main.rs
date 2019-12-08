@@ -22,7 +22,7 @@ const FS: &str = include_str!("displacement-fs.glsl");
 
 const FOVY: cgmath::Rad<f32> = cgmath::Rad(PI / 2.0);
 const Z_NEAR: f32 = 0.1;
-const Z_FAR: f32 = 10.;
+const Z_FAR: f32 = 1000.;
 
 fn main() {
     let matches = App::new("Rusty obj viewer")
@@ -61,11 +61,13 @@ fn start(model_path: &Path) {
     let mut back_buffer = surface.back_buffer().unwrap();
     
     let shape_obj = ObjLoader::load(model_path).unwrap();
+    let shape_aabb_tess = shape_obj.generate_aabb_tess(&mut surface).unwrap();
     let shape_tess = shape_obj.to_tess(&mut surface).unwrap();
-    let mut shape = Shape::new(shape_tess);
+    let shape_tesselations = vec!(shape_tess, shape_aabb_tess);
+    let mut shape = Shape::new(shape_tesselations);
 
     let projection = cgmath::perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
-    let view = cgmath::Matrix4::<f32>::look_at(cgmath::Point3::new(2., 2., 2.), cgmath::Point3::origin(), cgmath::Vector3::unit_y());
+    let view = cgmath::Matrix4::<f32>::look_at(cgmath::Point3::new(10., 10., 10.), cgmath::Point3::origin(), cgmath::Vector3::unit_y());
 
     let mut resize = false;
 
@@ -164,7 +166,7 @@ fn start(model_path: &Path) {
 
         surface
             .pipeline_builder()
-            .pipeline(&back_buffer, [1., 0., 0., 0.], |_, mut shd_gate| {
+            .pipeline(&back_buffer, [0., 0., 0., 0.], |_, mut shd_gate| {
                 // notice the iface free variable, which type is &ShaderInterface
                 shd_gate.shade(&program, |iface, mut rdr_gate| {
                     iface.projection.update(projection.into());
@@ -173,7 +175,10 @@ fn start(model_path: &Path) {
                     rdr_gate.render(RenderState::default(), |mut tess_gate| {
                         iface.transform.update(shape.get_transformation()
                             .transpose().copy_to_array());
-                        tess_gate.render(TessSlice::one_whole(shape.get_tess()));
+                        let tesselations = shape.get_tesselations();
+                        for tess in tesselations {
+                            tess_gate.render(TessSlice::one_whole(tess));
+                        }
                     });
                 });
             });
