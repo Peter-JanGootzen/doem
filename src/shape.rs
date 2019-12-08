@@ -26,13 +26,22 @@ impl Shape {
         &(&self.position * &self.scaling) * &self.rotation_matrix
     }
     pub fn set_rotation(&mut self, angle: Scalar) {
-        self.rotation_matrix = Matrix4::new_2d_rotation(angle);
+        self.rotation_matrix = Matrix4::new_2d_rotation_y(angle);
         self.rotation_angle = angle;
     }
-    pub fn rotate(&mut self, angle: Scalar) {
+    pub fn rotate_x(&mut self, angle: Scalar) {
         self.rotation_angle = self.rotation_angle + angle;
-        self.rotation_matrix = Matrix4::new_2d_rotation(self.rotation_angle);
+        self.rotation_matrix = Matrix4::new_2d_rotation_x(self.rotation_angle);
     }
+    pub fn rotate_y(&mut self, angle: Scalar) {
+        self.rotation_angle = self.rotation_angle + angle;
+        self.rotation_matrix = Matrix4::new_2d_rotation_y(self.rotation_angle);
+    }
+    pub fn rotate_z(&mut self, angle: Scalar) {
+        self.rotation_angle = self.rotation_angle + angle;
+        self.rotation_matrix = Matrix4::new_2d_rotation_z(self.rotation_angle);
+    }
+
     pub fn get_rotation_angle(&self) -> Scalar {
         self.rotation_angle
     }

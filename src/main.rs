@@ -48,7 +48,7 @@ fn main() {
 fn start(model_path: &Path) {
     let mut surface = GlfwSurface::new(
         WindowDim::Windowed(1600, 900),
-        "Hello, world!",
+        "Doem",
         WindowOpt::default(),
     )
     .expect("GLFW surface creation");
@@ -121,14 +121,34 @@ fn start(model_path: &Path) {
                 WindowEvent::Key(Key::Q, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    shape.rotate(-0.05);
+                    shape.rotate_y(-0.05);
                 }
                 WindowEvent::Key(Key::E, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    shape.rotate(0.05);
+                    shape.rotate_y(0.05);
                 }
-
+                WindowEvent::Key(Key::Z, _, action, _)
+                    if action == Action::Press || action == Action::Repeat =>
+                {
+                    shape.rotate_x(-0.05);
+                }
+                WindowEvent::Key(Key::X, _, action, _)
+                    if action == Action::Press || action == Action::Repeat =>
+                {
+                    shape.rotate_x(0.05);
+                }
+                WindowEvent::Key(Key::T, _, action, _)
+                    if action == Action::Press || action == Action::Repeat =>
+                {
+                    shape.rotate_z(-0.05);
+                }
+                WindowEvent::Key(Key::G, _, action, _)
+                    if action == Action::Press || action == Action::Repeat =>
+                {
+                    shape.rotate_z(0.05);
+                }
+ 
                 WindowEvent::FramebufferSize(..) => {
                     resize = true;
                 }
