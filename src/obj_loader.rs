@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use luminance::tess::{Mode, Tess, TessBuilder, TessError};
 use luminance::context::GraphicsContext;
 use wavefront_obj::obj;
-use rusty_linear_algebra::vector_space::Vector4;
+use doem_math::vector_space::Vector4;
 
 
 use crate::gl_common::{Vertex, VertexColor, VertexPosition};
@@ -24,7 +24,7 @@ type VertexIndex = u32;
 impl ObjLoader {
     pub fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError> where C: GraphicsContext {
         TessBuilder::new(ctx)
-            .set_mode(Mode::Line)
+            .set_mode(Mode::Triangle)
             .add_vertices(self.vertices)
             .set_indices(self.indices)
             .build()

@@ -1,4 +1,4 @@
-use rusty_linear_algebra::vector_space::{ Matrix4, Scalar };
+use doem_math::vector_space::{ Matrix4, Scalar };
 use luminance::tess::Tess;
 
 pub struct Shape {

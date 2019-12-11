@@ -13,7 +13,7 @@ use luminance::render_state::RenderState;
 use luminance::shader::program::Program;
 use luminance_glfw::{Action, GlfwSurface, Key, Surface, WindowDim, WindowEvent, WindowOpt};
 use luminance::tess::TessSlice;
-use rusty_linear_algebra::vector_space::{ Matrix4, PI };
+use doem_math::vector_space::{ Matrix4, PI };
 use cgmath;
 use cgmath::EuclideanSpace;
 
@@ -59,7 +59,7 @@ fn start(model_path: &Path) {
         .ignore_warnings();
 
     let mut back_buffer = surface.back_buffer().unwrap();
-    
+
     let shape_obj = ObjLoader::load(model_path).unwrap();
     let shape_aabb_tess = shape_obj.generate_aabb_tess(&mut surface).unwrap();
     let shape_tess = shape_obj.to_tess(&mut surface).unwrap();
