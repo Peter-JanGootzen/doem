@@ -1,6 +1,7 @@
 mod gl_common;
 mod obj_loader;
 mod shape;
+mod ecs;
 
 use crate::gl_common::{VertexSemantics, ShaderInterface};
 use crate::obj_loader::ObjLoader;
@@ -16,6 +17,9 @@ use luminance::tess::TessSlice;
 use doem_math::vector_space::{ Matrix4, PI };
 use cgmath;
 use cgmath::EuclideanSpace;
+use specs::prelude::*;
+use ecs::world::DoemWorld;
+use crate::ecs::dispatcher::DoemDispatcher;
 
 const VS: &str = include_str!("displacement-vs.glsl");
 const FS: &str = include_str!("displacement-fs.glsl");
@@ -65,6 +69,9 @@ fn start(model_path: &Path) {
     let shape_tess = shape_obj.to_tess(&mut surface).unwrap();
     let shape_tesselations = vec!(shape_tess, shape_aabb_tess);
     let mut shape = Shape::new(shape_tesselations);
+
+    let world = DoemWorld::new();
+    let dispatcher = DoemDispatcher::new();
 
     let projection = cgmath::perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
     let view = cgmath::Matrix4::<f32>::look_at(cgmath::Point3::new(10., 10., 10.), cgmath::Point3::origin(), cgmath::Vector3::unit_y());
