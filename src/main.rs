@@ -62,12 +62,16 @@ fn start(model_path: &Path) {
 
     let shape_obj = ObjLoader::load(model_path).unwrap();
     let shape_aabb_tess = shape_obj.generate_aabb_tess(&mut surface).unwrap();
+    let middle_point = shape_obj.middle_point.clone();
+    let x_half_size = shape_obj.x_half_size;
+    let y_half_size = shape_obj.y_half_size;
+    let z_half_size = shape_obj.z_half_size;
     let shape_tess = shape_obj.to_tess(&mut surface).unwrap();
     let shape_tesselations = vec!(shape_tess, shape_aabb_tess);
-    let mut shape = Shape::new(shape_tesselations);
+    let mut shape = Shape::new(shape_tesselations, middle_point, x_half_size, y_half_size, z_half_size);
 
     let projection = cgmath::perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
-    let view = cgmath::Matrix4::<f32>::look_at(cgmath::Point3::new(10., 10., 10.), cgmath::Point3::origin(), cgmath::Vector3::unit_y());
+    let view = cgmath::Matrix4::<f32>::look_at(cgmath::Point3::new(0.0, 0.0, 100.0), cgmath::Point3::origin(), cgmath::Vector3::unit_y());
 
     let mut resize = false;
 
@@ -82,28 +86,28 @@ fn start(model_path: &Path) {
                 | WindowEvent::Key(Key::Left, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    shape.position.data[0][3] += -0.01;
+                    shape.position.data[0][3] += -0.10;
                 }
 
                 WindowEvent::Key(Key::D, _, action, _)
                 | WindowEvent::Key(Key::Right, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    shape.position.data[0][3] += 0.01;
+                    shape.position.data[0][3] += 0.10;
                 }
 
                 WindowEvent::Key(Key::W, _, action, _)
                 | WindowEvent::Key(Key::Up, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    shape.position.data[1][3] += 0.01;
+                    shape.position.data[1][3] += 0.10;
                 }
 
                 WindowEvent::Key(Key::S, _, action, _)
                 | WindowEvent::Key(Key::Down, _, action, _)
                     if action == Action::Press || action == Action::Repeat =>
                 {
-                    shape.position.data[1][3] += -0.01;
+                    shape.position.data[1][3] += -0.10;
                 }
 
                 WindowEvent::Key(Key::K, _, action, _)
@@ -167,7 +171,6 @@ fn start(model_path: &Path) {
         surface
             .pipeline_builder()
             .pipeline(&back_buffer, [0., 0., 0., 0.], |_, mut shd_gate| {
-                // notice the iface free variable, which type is &ShaderInterface
                 shd_gate.shade(&program, |iface, mut rdr_gate| {
                     iface.projection.update(projection.into());
                     iface.view.update(view.into());
