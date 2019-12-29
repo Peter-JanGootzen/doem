@@ -180,6 +180,22 @@ impl ObjLoader {
             pos: VertexPosition::new([max_x, max_y, max_z]),
             color
         });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([0.0, 0.0, 0.0]),
+            color
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([max_x * 2.0, 0.0, 0.0]),
+            color: VertexColor::new([1.0, 0.0, 0.0 ])
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([0.0, max_y * 2.0, 0.0]),
+            color: VertexColor::new([0.0, 1.0, 0.0 ])
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([0.0, 0.0, max_z * 2.0]),
+            color: VertexColor::new([0.0, 0.0, 1.0 ])
+        });
 
         let aabb_indices: Vec<VertexIndex> = vec!(
             0, 1,
@@ -194,7 +210,10 @@ impl ObjLoader {
             2, 4,
             2, 5,
             7, 4,
-            7, 5
+            7, 5,
+            8, 9,
+            8, 10,
+            8, 11
         );
         TessBuilder::new(ctx)
             .set_mode(Mode::Line)

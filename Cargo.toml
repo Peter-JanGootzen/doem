@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-doem-math = { path = "../doem-math" }
+doem-math = { path = "./extern/doem-math" }
 luminance = "0.37.1"
 luminance-derive = "0.5.0"
 luminance-glfw = "0.11.0"
