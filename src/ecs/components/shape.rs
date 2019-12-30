@@ -1,5 +1,4 @@
 use specs::prelude::*;
-use luminance::tess::Tess;
 use doem_math::vector_space::Vector3;
 
 pub struct AABB {
@@ -8,7 +7,7 @@ pub struct AABB {
 }
 
 pub struct Shape {
-    pub tesselation: Tess,
+    pub tesselation_id: usize,
     pub bounding_box: AABB
 }
 

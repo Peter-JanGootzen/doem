@@ -7,7 +7,7 @@ use crate::ecs::components::collider::Collider;
 pub struct DoemWorld;
 impl DoemWorld {
     pub fn new() -> World {
-        let world = World::new();
+        let mut world = World::new();
 
         world.register::<Transform>();
         world.register::<Physics>();
