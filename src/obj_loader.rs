@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use luminance::tess::{Mode, Tess, TessBuilder, TessError};
 use luminance::context::GraphicsContext;
 use wavefront_obj::obj;
-use doem_math::vector_space::Vector4;
+use doem_math::vector_space::Vector3;
 
 
 use crate::gl_common::{Vertex, VertexColor, VertexPosition};
@@ -13,7 +13,7 @@ use crate::gl_common::{Vertex, VertexColor, VertexPosition};
 pub struct ObjLoader {
     vertices: Vec<Vertex>,
     indices: Vec<VertexIndex>,
-    pub middle_point: Vector4,
+    pub middle_point: Vector3,
     pub x_half_size: f32,
     pub y_half_size: f32,
     pub z_half_size: f32,
@@ -76,12 +76,12 @@ impl ObjLoader {
                                 vertices.push(vertex);
                                 indices.push(vertex_index);
 
-                                min_x = ObjLoader::parse_min_value(min_x, p.x as f32);
-                                min_y = ObjLoader::parse_min_value(min_y, p.y as f32);
-                                min_z = ObjLoader::parse_min_value(min_z, p.z as f32);
-                                max_x = ObjLoader::parse_max_value(max_x, p.x as f32);
-                                max_y = ObjLoader::parse_max_value(max_y, p.y as f32);
-                                max_z = ObjLoader::parse_max_value(max_z, p.z as f32);
+                                min_x = Self::parse_min_value(min_x, p.x as f32);
+                                min_y = Self::parse_min_value(min_y, p.y as f32);
+                                min_z = Self::parse_min_value(min_z, p.z as f32);
+                                max_x = Self::parse_max_value(max_x, p.x as f32);
+                                max_y = Self::parse_max_value(max_y, p.y as f32);
+                                max_z = Self::parse_max_value(max_z, p.z as f32);
                             }
                         }
                     } else {
@@ -102,14 +102,13 @@ impl ObjLoader {
         let y_half_size = (max_y - min_y) / 2.0;
         let z_half_size = (max_z - min_z) / 2.0;
 
-        let middle_point = Vector4::new_from_array([
+        let middle_point = Vector3::new_from_array([
             [ min_x + x_half_size ],
             [ min_y + y_half_size ],
             [ min_z + z_half_size ],
-            [ 1.0 ],
         ]);
 
-        Ok(ObjLoader { vertices, indices, middle_point, x_half_size, y_half_size, z_half_size })
+        Ok(Self { vertices, indices, middle_point, x_half_size, y_half_size, z_half_size })
     }
 
     fn parse_min_value(old: Option<f32>, new: f32) -> Option<f32> {

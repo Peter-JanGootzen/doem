@@ -4,7 +4,6 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use crate::ecs::systems::physics_system::PhysicsSystem;
 use crate::ecs::systems::gl_system::GLSystem;
-use crate::tess_manager::TessManager;
 
 pub struct DoemDispatcher;
 
