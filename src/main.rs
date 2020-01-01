@@ -4,16 +4,19 @@ mod obj_loader;
 mod ecs;
 mod tess_manager;
 
-use crate::ecs::components::shape::Shape;
 
 use clap::{Arg, App};
 use luminance_glfw::{GlfwSurface, Surface, WindowDim, WindowOpt};
 use specs::WorldExt;
 use specs::prelude::*;
+use doem_math::vector_space::{ Matrix4, Vector3 };
 use std::sync::Arc;
 use std::sync::Mutex;
 use crate::ecs::world::DoemWorld;
 use crate::ecs::dispatcher::DoemDispatcher;
+use crate::ecs::components::shape::Shape;
+use crate::ecs::components::transform::Transform;
+use crate::ecs::components::physics::Physics;
 
 fn main() {
     let matches = App::new("Rusty obj viewer")
@@ -46,7 +49,29 @@ fn start(model_path: &str) {
     let should_quit = Arc::new(Mutex::new(false));
     let mut world = DoemWorld::new();
 
-    world.create_entity().with(Shape::Unit { obj_path: model_path.to_owned() }).build();
+    world.create_entity()
+         .with(Shape::Unit { obj_path: model_path.to_owned() })
+         .with(Transform {
+           position: Vector3::new_from_array([
+             [0.0],
+             [0.0],
+             [0.0]
+           ]),
+           scale: Vector3::new_from_array([
+             [1.0],
+             [1.0],
+             [1.0]
+           ]),
+           orientation: Matrix4::identity()
+         })
+         .with(Physics {
+           velocity: Vector3::new_from_array([
+             [1.0],
+             [0.0],
+             [0.0],
+           ])
+         })
+         .build();
     let mut dispatcher = DoemDispatcher::new(surface, should_quit.clone());
     dispatcher.setup(&mut world);
     'game_loop: loop {

@@ -70,13 +70,10 @@ impl<'a> System<'a> for GLSystem {
                        WriteStorage<'a, Transform>,
                        WriteStorage<'a, Shape>);
 
-    fn run(&mut self, (mut events, _transform, mut shape): Self::SystemData) {
+    fn run(&mut self, (mut events, transform, mut shape): Self::SystemData) {
         for s in (&mut shape).join() {
-            match s {
-                Shape::Unit { .. } => {
-                    *s = self.tess_manager.init_shape((*s).clone());
-                }
-                _ => ()
+            if let Shape::Unit { .. } = s {
+                *s = self.tess_manager.init_shape((*s).clone());
             }
         }
 
@@ -94,15 +91,20 @@ impl<'a> System<'a> for GLSystem {
                     rdr_gate.render(RenderState::default(), |mut tess_gate| {
                         // Render all the tesselations with their transformations
                         iface.transform.update(Matrix4::identity().transpose().copy_to_array());
-                        for s in shape.join() {
-                            match s {
-                                Shape::Init { tess_id, bounding_box: _, bounding_box_tess_id } => {
-                                    let tess_ref = tess_manager.get_tess(*tess_id).unwrap();
-                                    tess_gate.render(TessSlice::one_whole(tess_ref));
-                                    let bounding_box_tess_ref = tess_manager.get_tess(*bounding_box_tess_id).unwrap();
-                                    tess_gate.render(TessSlice::one_whole(bounding_box_tess_ref));
-                                }
-                                _ => ()
+                        for (s, t) in (&shape, &transform).join() {
+                            if let Shape::Init { tess_id, bounding_box: _, bounding_box_tess_id } = s {
+                                let translation = Matrix4::get_translation(&t.position);
+                                let scaling = Matrix4::get_scaling(&t.scale);
+                                let orientation = &t.orientation;
+
+                                let transform = &translation * &(orientation * &scaling);
+                                println!("{}", &transform);
+                                iface.transform.update(transform.transpose().copy_to_array());
+
+                                let tess_ref = tess_manager.get_tess(*tess_id).unwrap();
+                                tess_gate.render(TessSlice::one_whole(tess_ref));
+                                let bounding_box_tess_ref = tess_manager.get_tess(*bounding_box_tess_id).unwrap();
+                                tess_gate.render(TessSlice::one_whole(bounding_box_tess_ref));
                             }
                         }
                     });
