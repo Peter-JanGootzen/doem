@@ -7,4 +7,3 @@ impl Default for DoemEvents {
         DoemEvents(Vec::<WindowEvent>::new())
     }
 }
-

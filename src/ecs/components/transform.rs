@@ -1,5 +1,5 @@
+use doem_math::vector_space::{Matrix4, Vector3};
 use specs::prelude::*;
-use doem_math::vector_space::{ Vector3, Matrix4 };
 
 pub struct Transform {
     pub position: Vector3,

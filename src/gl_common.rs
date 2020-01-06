@@ -1,5 +1,5 @@
-use luminance_derive::{Semantics, Vertex, UniformInterface};
 use luminance::shader::program::Uniform;
+use luminance_derive::{Semantics, UniformInterface, Vertex};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Semantics)]
 pub enum VertexSemantics {

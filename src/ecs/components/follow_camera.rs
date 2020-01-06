@@ -1,9 +1,9 @@
-use specs::prelude::*;
 use doem_math::vector_space::Vector3;
+use specs::prelude::*;
 
 pub struct FollowCamera {
     pub zoom_level: f32,
-    pub offset: Vector3
+    pub offset: Vector3,
 }
 
 impl Component for FollowCamera {

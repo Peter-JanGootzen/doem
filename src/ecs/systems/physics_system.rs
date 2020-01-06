@@ -1,6 +1,6 @@
-use specs::prelude::*;
-use crate::ecs::components::transform::Transform;
 use crate::ecs::components::physics::Physics;
+use crate::ecs::components::transform::Transform;
+use specs::prelude::*;
 
 pub struct PhysicsSystem;
 

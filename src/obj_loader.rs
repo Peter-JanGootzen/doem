@@ -1,11 +1,11 @@
-use std::fs::File;
-use std::path::Path;
-use std::io::Read;
-use std::collections::HashMap;
-use luminance::tess::{Mode, Tess, TessBuilder, TessError};
-use luminance::context::GraphicsContext;
-use wavefront_obj::obj;
 use doem_math::vector_space::Vector3;
+use luminance::context::GraphicsContext;
+use luminance::tess::{Mode, Tess, TessBuilder, TessError};
+use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
+use wavefront_obj::obj;
 
 use crate::gl_common::{Vertex, VertexColor, VertexPosition};
 
@@ -21,14 +21,20 @@ pub struct ObjLoader {
 type VertexIndex = u32;
 
 impl ObjLoader {
-    pub fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError> where C: GraphicsContext {
+    pub fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError>
+    where
+        C: GraphicsContext,
+    {
         TessBuilder::new(ctx)
-            .set_mode(Mode::Triangle)
+            .set_mode(Mode::Line)
             .add_vertices(self.vertices)
             .set_indices(self.indices)
             .build()
     }
-    pub fn load<P>(path: P) -> Result<Self, String> where P: AsRef<Path> {
+    pub fn load<P>(path: P) -> Result<Self, String>
+    where
+        P: AsRef<Path>,
+    {
         let file_content = {
             let mut file = File::open(path).map_err(|e| format!("cannot open file: {}", e))?;
             let mut content = String::new();
@@ -67,10 +73,10 @@ impl ObjLoader {
                                 let p = object.vertices[key.0];
                                 let vertex = Vertex {
                                     pos: VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]),
-                                    color: VertexColor::new([color, color, color ])
+                                    color: VertexColor::new([color, color, color]),
                                 };
                                 let vertex_index = vertices.len() as VertexIndex;
-        
+
                                 vertex_cache.insert(**key, vertex_index);
                                 vertices.push(vertex);
                                 indices.push(vertex_index);
@@ -102,12 +108,19 @@ impl ObjLoader {
         let z_half_size = (max_z - min_z) / 2.0;
 
         let middle_point = Vector3::new_from_array([
-            [ min_x + x_half_size ],
-            [ min_y + y_half_size ],
-            [ min_z + z_half_size ],
+            [min_x + x_half_size],
+            [min_y + y_half_size],
+            [min_z + z_half_size],
         ]);
 
-        Ok(Self { vertices, indices, middle_point, x_half_size, y_half_size, z_half_size })
+        Ok(Self {
+            vertices,
+            indices,
+            middle_point,
+            x_half_size,
+            y_half_size,
+            z_half_size,
+        })
     }
 
     fn parse_min_value(old: Option<f32>, new: f32) -> Option<f32> {
@@ -135,10 +148,13 @@ impl ObjLoader {
         }
     }
 
-    pub fn generate_aabb_tess<C>(&self, ctx: &mut C) -> Result<Tess, TessError> where C: GraphicsContext {
+    pub fn generate_aabb_tess<C>(&self, ctx: &mut C) -> Result<Tess, TessError>
+    where
+        C: GraphicsContext,
+    {
         let mut aabb_vertices: Vec<Vertex> = Vec::new();
 
-        let color = VertexColor::new([0.0, 1.0, 0.0 ]);
+        let color = VertexColor::new([0.0, 1.0, 0.0]);
         let min_x = self.middle_point.data[0][0] - self.x_half_size;
         let min_y = self.middle_point.data[1][0] - self.y_half_size;
         let min_z = self.middle_point.data[2][0] - self.z_half_size;
@@ -148,71 +164,57 @@ impl ObjLoader {
 
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([min_x, min_y, min_z]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([max_x, min_y, min_z]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([min_x, max_y, min_z]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([min_x, min_y, max_z]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([max_x, max_y, min_z]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([min_x, max_y, max_z]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([max_x, min_y, max_z]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([max_x, max_y, max_z]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([0.0, 0.0, 0.0]),
-            color
+            color,
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([max_x * 2.0, 0.0, 0.0]),
-            color: VertexColor::new([1.0, 0.0, 0.0 ])
+            color: VertexColor::new([1.0, 0.0, 0.0]),
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([0.0, max_y * 2.0, 0.0]),
-            color: VertexColor::new([0.0, 1.0, 0.0 ])
+            color: VertexColor::new([0.0, 1.0, 0.0]),
         });
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([0.0, 0.0, max_z * 2.0]),
-            color: VertexColor::new([0.0, 0.0, 1.0 ])
+            color: VertexColor::new([0.0, 0.0, 1.0]),
         });
 
-        let aabb_indices: Vec<VertexIndex> = vec!(
-            0, 1,
-            0, 3,
-            0, 2,
-            1, 0,
-            1, 6,
-            1, 4,
-            6, 3,
-            6, 7,
-            3, 5,
-            2, 4,
-            2, 5,
-            7, 4,
-            7, 5,
-            8, 9,
-            8, 10,
-            8, 11
-        );
+        let aabb_indices: Vec<VertexIndex> = vec![
+            0, 1, 0, 3, 0, 2, 1, 0, 1, 6, 1, 4, 6, 3, 6, 7, 3, 5, 2, 4, 2, 5, 7, 4, 7, 5, 8, 9, 8,
+            10, 8, 11,
+        ];
         TessBuilder::new(ctx)
             .set_mode(Mode::Line)
             .add_vertices(aabb_vertices)
