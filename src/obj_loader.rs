@@ -7,7 +7,6 @@ use luminance::context::GraphicsContext;
 use wavefront_obj::obj;
 use doem_math::vector_space::Vector3;
 
-
 use crate::gl_common::{Vertex, VertexColor, VertexPosition};
 
 pub struct ObjLoader {

@@ -8,9 +8,9 @@ edition = "2018"
 
 [dependencies]
 doem-math = { git = "https://github.com/Peter-JanGootzen/doem-math" }
-luminance = "0.37.1"
-luminance-derive = "0.5.0"
-luminance-glfw = "0.11.0"
+luminance = "0.38"
+luminance-derive = "0.5.1"
+luminance-glfw = "0.12.0"
 wavefront_obj = "2.0.4"
 try-guard = "0.2.0"
 cgmath = "0.17.0"

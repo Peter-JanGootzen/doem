@@ -2,6 +2,7 @@ use specs::prelude::*;
 use luminance_glfw::{WindowEvent, Action, Key};
 use crate::ecs::resources::doem_events::DoemEvents;
 use crate::ecs::components::transform::Transform;
+use crate::ecs::components::transformable::Transformable;
 use crate::ecs::components::shape::Shape;
 use doem_math::vector_space::{ Vector3, Vector4, Matrix4, Scalar };
 
@@ -9,39 +10,40 @@ pub struct TransformationsSystem;
 
 impl<'a> System<'a> for TransformationsSystem {
     type SystemData = (Read<'a, DoemEvents>,
+                       ReadStorage<'a, Transformable>,
                        WriteStorage<'a, Transform>,
                        ReadStorage<'a, Shape>);
 
-    fn run(&mut self, (events, mut transform, shape): Self::SystemData) {
-        for (t, s) in (&mut transform, &shape).join() {
+    fn run(&mut self, (events, transformable, mut transform, shape): Self::SystemData) {
+        for (_t, t, s) in (&transformable, &mut transform, &shape).join() {
             for event in &events.0 {
                 match event {
                     WindowEvent::Key(Key::A, _, action, _)
                     | WindowEvent::Key(Key::Left, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.position[0][0] += -0.10;
+                        t.position[2][0] += 0.010;
                     }
 
                     WindowEvent::Key(Key::D, _, action, _)
                     | WindowEvent::Key(Key::Right, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.position.data[0][0] += 0.10;
+                        t.position[2][0] += -0.010;
                     }
 
                     WindowEvent::Key(Key::W, _, action, _)
                     | WindowEvent::Key(Key::Up, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.position.data[1][0] += 0.10;
+                        t.position.data[0][0] += -0.010;
                     }
 
                     WindowEvent::Key(Key::S, _, action, _)
                     | WindowEvent::Key(Key::Down, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.position.data[1][0] += -0.10;
+                        t.position.data[0][0] += 0.010;
                     }
 
                     WindowEvent::Key(Key::K, _, action, _)
