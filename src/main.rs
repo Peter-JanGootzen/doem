@@ -1,28 +1,22 @@
 mod gl_common;
 mod obj_loader;
-mod shape;
+//mod shape;
+mod ecs;
+mod tess_manager;
 
-use crate::gl_common::{VertexSemantics, ShaderInterface};
-use crate::obj_loader::ObjLoader;
-use crate::shape::Shape;
 
-use std::path::Path;
 use clap::{Arg, App};
-use luminance::context::GraphicsContext;
-use luminance::render_state::RenderState;
-use luminance::shader::program::Program;
-use luminance_glfw::{Action, GlfwSurface, Key, Surface, WindowDim, WindowEvent, WindowOpt};
-use luminance::tess::TessSlice;
-use doem_math::vector_space::{ Matrix4, PI };
-use cgmath;
-use cgmath::EuclideanSpace;
-
-const VS: &str = include_str!("displacement-vs.glsl");
-const FS: &str = include_str!("displacement-fs.glsl");
-
-const FOVY: cgmath::Rad<f32> = cgmath::Rad(PI / 2.0);
-const Z_NEAR: f32 = 0.1;
-const Z_FAR: f32 = 1000.;
+use luminance_glfw::{GlfwSurface, Surface, WindowDim, WindowOpt};
+use specs::WorldExt;
+use specs::prelude::*;
+use doem_math::vector_space::{ Matrix4, Vector3 };
+use std::sync::Arc;
+use std::sync::Mutex;
+use crate::ecs::world::DoemWorld;
+use crate::ecs::dispatcher::DoemDispatcher;
+use crate::ecs::components::shape::Shape;
+use crate::ecs::components::transform::Transform;
+use crate::ecs::components::physics::Physics;
 
 fn main() {
     let matches = App::new("Rusty obj viewer")
@@ -40,151 +34,52 @@ fn main() {
                           .get_matches();
 
     let model_path_str = matches.value_of("model_path").unwrap();
-    let model_path = Path::new(model_path_str);
 
-    start(&model_path);
+    start(&model_path_str);
 }
 
-fn start(model_path: &Path) {
-    let mut surface = GlfwSurface::new(
+fn start(model_path: &str) {
+    let surface = GlfwSurface::new(
         WindowDim::Windowed(1600, 900),
         "Doem",
         WindowOpt::default(),
     )
     .expect("GLFW surface creation");
 
-    // see the use of our uniform interface here as thirds type variable
-    let program = Program::<VertexSemantics, (), ShaderInterface>::from_strings(None, VS, None, FS)
-        .expect("program creation")
-        .ignore_warnings();
+    let should_quit = Arc::new(Mutex::new(false));
+    let mut world = DoemWorld::new();
 
-    let mut back_buffer = surface.back_buffer().unwrap();
-
-    let shape_obj = ObjLoader::load(model_path).unwrap();
-    let shape_aabb_tess = shape_obj.generate_aabb_tess(&mut surface).unwrap();
-    let middle_point = shape_obj.middle_point.clone();
-    let x_half_size = shape_obj.x_half_size;
-    let y_half_size = shape_obj.y_half_size;
-    let z_half_size = shape_obj.z_half_size;
-    let shape_tess = shape_obj.to_tess(&mut surface).unwrap();
-    let shape_tesselations = vec!(shape_tess, shape_aabb_tess);
-    let mut shape = Shape::new(shape_tesselations, middle_point, x_half_size, y_half_size, z_half_size);
-
-    let projection = cgmath::perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
-    let view = cgmath::Matrix4::<f32>::look_at(cgmath::Point3::new(0.0, 0.0, 100.0), cgmath::Point3::origin(), cgmath::Vector3::unit_y());
-
-    let mut resize = false;
-
-    'app: loop {
-        for event in surface.poll_events() {
-            match event {
-                WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => {
-                    break 'app
-                }
-
-                WindowEvent::Key(Key::A, _, action, _)
-                | WindowEvent::Key(Key::Left, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.position.data[0][3] += -0.10;
-                }
-
-                WindowEvent::Key(Key::D, _, action, _)
-                | WindowEvent::Key(Key::Right, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.position.data[0][3] += 0.10;
-                }
-
-                WindowEvent::Key(Key::W, _, action, _)
-                | WindowEvent::Key(Key::Up, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.position.data[1][3] += 0.10;
-                }
-
-                WindowEvent::Key(Key::S, _, action, _)
-                | WindowEvent::Key(Key::Down, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.position.data[1][3] += -0.10;
-                }
-
-                WindowEvent::Key(Key::K, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.scaling.data[0][0] += 0.1;
-                    shape.scaling.data[1][1] += 0.1;
-                    shape.scaling.data[2][2] += 0.1;
-                }
-                WindowEvent::Key(Key::J, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.scaling.data[0][0] -= 0.1;
-                    shape.scaling.data[1][1] -= 0.1;
-                    shape.scaling.data[2][2] -= 0.1;
-                }
-                WindowEvent::Key(Key::Q, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.rotate_y(-0.05);
-                }
-                WindowEvent::Key(Key::E, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.rotate_y(0.05);
-                }
-                WindowEvent::Key(Key::Z, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.rotate_x(-0.05);
-                }
-                WindowEvent::Key(Key::X, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.rotate_x(0.05);
-                }
-                WindowEvent::Key(Key::T, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.rotate_z(-0.05);
-                }
-                WindowEvent::Key(Key::G, _, action, _)
-                    if action == Action::Press || action == Action::Repeat =>
-                {
-                    shape.rotate_z(0.05);
-                }
- 
-                WindowEvent::FramebufferSize(..) => {
-                    resize = true;
-                }
-
-                _ => (),
-            }
+    world.create_entity()
+         .with(Shape::Unit { obj_path: model_path.to_owned() })
+         .with(Transform {
+           position: Vector3::new_from_array([
+             [0.0],
+             [0.0],
+             [0.0]
+           ]),
+           scale: Vector3::new_from_array([
+             [1.0],
+             [1.0],
+             [1.0]
+           ]),
+           orientation: Matrix4::identity()
+         })
+         .with(Physics {
+           velocity: Vector3::new_from_array([
+             [1.0],
+             [0.0],
+             [0.0],
+           ])
+         })
+         .build();
+    let mut dispatcher = DoemDispatcher::new(surface, should_quit.clone());
+    dispatcher.setup(&mut world);
+    'game_loop: loop {
+        dispatcher.dispatch(&mut world);
+        world.maintain();
+        if *(*should_quit).lock().unwrap() {
+            break 'game_loop;
         }
-
-        if resize {
-            back_buffer = surface.back_buffer().unwrap();
-            resize = false;
-        }
-
-        surface
-            .pipeline_builder()
-            .pipeline(&back_buffer, [0., 0., 0., 0.], |_, mut shd_gate| {
-                shd_gate.shade(&program, |iface, mut rdr_gate| {
-                    iface.projection.update(projection.into());
-                    iface.view.update(view.into());
-
-                    rdr_gate.render(RenderState::default(), |mut tess_gate| {
-                        iface.transform.update(shape.get_transformation()
-                            .transpose().copy_to_array());
-                        let tesselations = shape.get_tesselations();
-                        for tess in tesselations {
-                            tess_gate.render(TessSlice::one_whole(tess));
-                        }
-                    });
-                });
-            });
-        surface.swap_buffers();
     }
+
 }
