@@ -5,7 +5,6 @@ use std::rc::Rc;
 use std::sync::Mutex;
 use std::cell::RefCell;
 use cgmath;
-use cgmath::EuclideanSpace;
 use luminance_glfw::{Action, Key, GlfwSurface, Surface, WindowEvent};
 use luminance::shader::program::Program;
 use luminance::texture::{Dim2,Flat};
@@ -24,7 +23,7 @@ use crate::ecs::resources::doem_events::DoemEvents;
 const VS: &str = include_str!("../../shaders/displacement-vs.glsl");
 const FS: &str = include_str!("../../shaders/displacement-fs.glsl");
 
-const FOVY: cgmath::Rad<f32> = cgmath::Rad(PI / 2.0);
+const FOVY: f32 = PI / 2.0;
 const Z_NEAR: f32 = 0.1;
 const Z_FAR: f32 = 1000.;
 
@@ -61,11 +60,13 @@ impl<'a> System<'a> for GLSystem {
                        ReadStorage<'a, FollowCamera>);
 
     fn run(&mut self, (mut events, transform, mut shape, camera): Self::SystemData) {
-        let projection = cgmath::perspective(FOVY, self.surface.borrow().width() as f32 / self.surface.borrow().height() as f32, Z_NEAR, Z_FAR);
+        //let projection = cgmath::perspective(FOVY, self.surface.borrow().width() as f32 / self.surface.borrow().height() as f32, Z_NEAR, Z_FAR);
+        let projection = Matrix4::get_projection(FOVY, self.surface.borrow().width() as f32 / self.surface.borrow().height() as f32, Z_NEAR, Z_FAR);
         let mut view: Option<Matrix4> = None;
         for (t, c) in (&transform, &camera).join() {
             let camera_at_origin = &c.offset * c.zoom_level;
-            let eye = &t.position + &camera_at_origin;
+            let camera_at_origin_rotated = &t.orientation * &camera_at_origin.dimension_hop();
+            let eye = &t.position + &camera_at_origin_rotated.dimension_hop();
             let look_at = &t.position;
             let up = Vector3::new_from_array([
                 [0.0],
@@ -89,7 +90,7 @@ impl<'a> System<'a> for GLSystem {
             .pipeline_builder()
             .pipeline(&self.back_buffer, &PipelineState::default(), |_, mut shd_gate| {
                 shd_gate.shade(shader_program, |iface, mut rdr_gate| {
-                    iface.projection.update(projection.into());
+                    iface.projection.update(projection.transpose().copy_to_array());
                     iface.view.update(view.transpose().copy_to_array());
 
                     rdr_gate.render(&RenderState::default(), |mut tess_gate| {

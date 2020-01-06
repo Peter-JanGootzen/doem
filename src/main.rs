@@ -88,7 +88,7 @@ fn start(model_path: &str, model_path_2: &str) {
            offset: Vector3::new_from_array([
              [3.0],
              [2.0],
-             [0.0],
+             [0.0]
            ])
          })
          .build();
