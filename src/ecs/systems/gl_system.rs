@@ -1,5 +1,5 @@
 use specs::prelude::*;
-use doem_math::vector_space::{ PI, Matrix4 };
+use doem_math::vector_space::{ PI, Matrix4, Vector3 };
 use std::sync::Arc;
 use std::rc::Rc;
 use std::sync::Mutex;
@@ -17,6 +17,7 @@ use crate::gl_common::{VertexSemantics, ShaderInterface};
 use crate::ecs::components::transform::Transform;
 use crate::ecs::components::shape::Shape;
 use crate::tess_manager::TessManager;
+use crate::ecs::resources::doem_events::DoemEvents;
 
 const VS: &str = include_str!("../../shaders/displacement-vs.glsl");
 const FS: &str = include_str!("../../shaders/displacement-fs.glsl");
@@ -25,21 +26,13 @@ const FOVY: cgmath::Rad<f32> = cgmath::Rad(PI / 2.0);
 const Z_NEAR: f32 = 0.1;
 const Z_FAR: f32 = 1000.;
 
-pub struct DoemEvents(Vec<WindowEvent>);
-
-impl Default for DoemEvents {
-    fn default() -> DoemEvents {
-        DoemEvents(Vec::<WindowEvent>::new())
-    }
-}
-
 pub struct GLSystem {
     surface: Rc<RefCell<GlfwSurface>>,
     back_buffer: Framebuffer<Flat, Dim2, (), ()>,
     tess_manager: TessManager,
     shader_program: Program::<VertexSemantics, (), ShaderInterface>,
     projection: cgmath::Matrix4<f32>,
-    view: cgmath::Matrix4<f32>,
+    view: Matrix4,
     should_quit: Arc<Mutex<bool>>
 }
 
@@ -50,7 +43,15 @@ impl GLSystem {
             .expect("Shaders could not be initialized, bye :(")
             .ignore_warnings();
         let projection = cgmath::perspective(FOVY, surface.width() as f32 / surface.height() as f32, Z_NEAR, Z_FAR);
-        let view = cgmath::Matrix4::<f32>::look_at(cgmath::Point3::new(0.0, 0.0, 100.0), cgmath::Point3::origin(), cgmath::Vector3::unit_y());
+        let view =  Matrix4::get_view(&Vector3::new_from_array([
+            [0.0],
+            [0.0],
+            [2.0]
+        ]), &Vector3::origin(), &Vector3::new_from_array([
+            [0.0],
+            [1.0],
+            [0.0]
+        ]));
         let surface = Rc::new(RefCell::new(surface));
         let tess_manager = TessManager::new(surface.clone());
         Self {
@@ -86,7 +87,7 @@ impl<'a> System<'a> for GLSystem {
             .pipeline(&self.back_buffer, [0., 0., 0., 0.], |_, mut shd_gate| {
                 shd_gate.shade(shader_program, |iface, mut rdr_gate| {
                     iface.projection.update((*projection).into());
-                    iface.view.update((*view).into());
+                    iface.view.update(view.transpose().copy_to_array());
 
                     rdr_gate.render(RenderState::default(), |mut tess_gate| {
                         // Render all the tesselations with their transformations
@@ -95,9 +96,8 @@ impl<'a> System<'a> for GLSystem {
                             if let Shape::Init { tess_id, bounding_box: _, bounding_box_tess_id } = s {
                                 let translation = Matrix4::get_translation(&t.position);
                                 let scaling = Matrix4::get_scaling(&t.scale);
-                                let orientation = &t.orientation;
 
-                                let transform = &translation * &(orientation * &scaling);
+                                let transform = &translation * &(&t.orientation * &scaling);
                                 println!("{}", &transform);
                                 iface.transform.update(transform.transpose().copy_to_array());
 
@@ -110,11 +110,13 @@ impl<'a> System<'a> for GLSystem {
                     });
                 });
             });
+
         tess_manager.end();
         self.surface.borrow_mut().swap_buffers();
 
         let mut resize = false;
 
+        events.0.clear();
         for event in self.surface.borrow_mut().poll_events() {
             match event {
                 WindowEvent::Close | WindowEvent::Key(Key::Escape, _, Action::Release, _) => {
