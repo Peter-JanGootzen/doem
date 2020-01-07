@@ -8,6 +8,7 @@ use crate::ecs::components::follow_camera::FollowCamera;
 use crate::ecs::components::physics::Physics;
 use crate::ecs::components::shape::Shape;
 use crate::ecs::components::transform::Transform;
+use crate::ecs::components::pulsate::Pulsate;
 use crate::ecs::components::transformable::Transformable;
 use crate::ecs::dispatcher::DoemDispatcher;
 use crate::ecs::world::DoemWorld;
@@ -70,12 +71,18 @@ fn start(model_path: &str, model_path_2: &str) {
             orientation: Matrix4::identity(),
         })
         .with(Physics {
-            velocity: Vector3::new_from_array([[0.01], [0.0], [0.0]]),
+            velocity: Vector3::new_from_array([[0.30], [0.0], [0.0]]),
         })
         .with(Transformable)
         .with(FollowCamera {
             zoom_level: 10.0,
-            offset: Vector3::new_from_array([[3.0], [2.0], [0.0]]),
+            offset: Vector3::new_from_array([[20.0], [10.0], [0.0]]),
+        })
+        .with(Pulsate {
+            speed: Vector3::new_from_array([[0.01], [0.01], [0.01]]),
+            current_direction: true,
+            min_scale: Vector3::new_from_array([[-5.0], [-5.0], [-5.0]]),
+            max_scale: Vector3::new_from_array([[5.0], [5.0], [5.0]]),
         })
         .build();
 
@@ -86,7 +93,7 @@ fn start(model_path: &str, model_path_2: &str) {
         })
         .with(Transform {
             position: Vector3::new_from_array([[1.0], [-3.0], [0.0]]),
-            scale: Vector3::new_from_array([[1.0], [1.0], [1.0]]),
+            scale: Vector3::new_from_array([[10.0], [1.0], [10.0]]),
             orientation: Matrix4::identity(),
         })
         .build();

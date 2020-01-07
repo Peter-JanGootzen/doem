@@ -192,7 +192,7 @@ dependencies = [
 [[package]]
 name = "doem-math"
 version = "0.1.0"
-source = "git+https://github.com/Peter-JanGootzen/doem-math#6c96d28cc49289e59735160dd94c70923bfb44fa"
+source = "git+https://github.com/Peter-JanGootzen/doem-math#5777e078ef51ac69c166183af35cb557a3af08ba"
 dependencies = [
  "float-cmp 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "staticvec 0.6.91 (registry+https://github.com/rust-lang/crates.io-index)",

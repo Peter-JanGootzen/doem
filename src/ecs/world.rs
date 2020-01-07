@@ -4,6 +4,7 @@ use crate::ecs::components::physics::Physics;
 use crate::ecs::components::shape::Shape;
 use crate::ecs::components::transform::Transform;
 use crate::ecs::components::transformable::Transformable;
+use crate::ecs::components::pulsate::Pulsate;
 use specs::prelude::*;
 
 pub struct DoemWorld;
@@ -17,6 +18,7 @@ impl DoemWorld {
         world.register::<Shape>();
         world.register::<FollowCamera>();
         world.register::<Transformable>();
+        world.register::<Pulsate>();
 
         world
     }

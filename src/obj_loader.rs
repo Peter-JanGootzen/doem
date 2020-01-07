@@ -26,7 +26,7 @@ impl ObjLoader {
         C: GraphicsContext,
     {
         TessBuilder::new(ctx)
-            .set_mode(Mode::Line)
+            .set_mode(Mode::Triangle)
             .add_vertices(self.vertices)
             .set_indices(self.indices)
             .build()
@@ -73,7 +73,7 @@ impl ObjLoader {
                                 let p = object.vertices[key.0];
                                 let vertex = Vertex {
                                     pos: VertexPosition::new([p.x as f32, p.y as f32, p.z as f32]),
-                                    color: VertexColor::new([color, color, color]),
+                                    color: VertexColor::new([0.2, color, 0.2]),
                                 };
                                 let vertex_index = vertices.len() as VertexIndex;
 

@@ -62,7 +62,6 @@ impl<'a> System<'a> for GLSystem {
     );
 
     fn run(&mut self, (mut events, transform, mut shape, camera): Self::SystemData) {
-        //let projection = cgmath::perspective(FOVY, self.surface.borrow().width() as f32 / self.surface.borrow().height() as f32, Z_NEAR, Z_FAR);
         let projection = Matrix4::get_projection(
             FOVY,
             self.surface.borrow().width() as f32 / self.surface.borrow().height() as f32,
@@ -115,7 +114,6 @@ impl<'a> System<'a> for GLSystem {
                                 let scaling = Matrix4::get_scaling(&t.scale);
 
                                 let transform = &translation * &(&t.orientation * &scaling);
-                                println!("{}", &transform);
                                 iface
                                     .transform
                                     .update(transform.transpose().copy_to_array());

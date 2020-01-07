@@ -65,32 +65,32 @@ impl<'a> System<'a> for TransformationsSystem {
                     WindowEvent::Key(Key::Q, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_y(&t.orientation, s, -0.05);
+                        t.orientation = Self::rotate_y(&t.orientation, s, 0.05);
                     }
                     WindowEvent::Key(Key::E, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_y(&t.orientation, s, 0.05);
+                        t.orientation = Self::rotate_y(&t.orientation, s, -0.05);
                     }
                     WindowEvent::Key(Key::Z, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_x(&t.orientation, s, -0.05);
+                        t.orientation = Self::rotate_x(&t.orientation, s, 0.05);
                     }
                     WindowEvent::Key(Key::X, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_x(&t.orientation, s, 0.05);
+                        t.orientation = Self::rotate_x(&t.orientation, s, -0.05);
                     }
                     WindowEvent::Key(Key::T, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_z(&t.orientation, s, -0.05);
+                        t.orientation = Self::rotate_z(&t.orientation, s, 0.05);
                     }
                     WindowEvent::Key(Key::G, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_z(&t.orientation, s, 0.05);
+                        t.orientation = Self::rotate_z(&t.orientation, s, -0.05);
                     }
 
                     _ => (),
