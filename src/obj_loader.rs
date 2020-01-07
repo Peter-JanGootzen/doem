@@ -107,11 +107,18 @@ impl ObjLoader {
         let y_half_size = (max_y - min_y) / 2.0;
         let z_half_size = (max_z - min_z) / 2.0;
 
-        let middle_point = Vector3::new_from_array([
+        let mut middle_point = Vector3::new_from_array([
             [min_x + x_half_size],
             [min_y + y_half_size],
-            [min_z + z_half_size],
+            [min_z + z_half_size]
         ]);
+
+        for v in vertices.iter_mut() {
+            (*v.pos)[0] -= middle_point[0][0];
+            (*v.pos)[1] -= middle_point[1][0];
+            (*v.pos)[2] -= middle_point[2][0];
+        }
+        middle_point = Vector3::origin();
 
         Ok(Self {
             vertices,

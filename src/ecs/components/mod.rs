@@ -5,3 +5,6 @@ pub mod shape;
 pub mod transform;
 pub mod pulsate;
 pub mod transformable;
+pub mod damage;
+pub mod health;
+pub mod gun;

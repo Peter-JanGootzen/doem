@@ -181,8 +181,9 @@ version = "0.1.0"
 dependencies = [
  "clap 2.33.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "doem-math 0.1.0 (git+https://github.com/Peter-JanGootzen/doem-math)",
+ "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "luminance 0.38.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "luminance-derive 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "luminance-derive 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "luminance-glfw 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "specs 0.15.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "try-guard 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -320,7 +321,7 @@ dependencies = [
 
 [[package]]
 name = "luminance-derive"
-version = "0.5.1"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -732,7 +733,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum libc 0.2.66 (registry+https://github.com/rust-lang/crates.io-index)" = "d515b1f41455adea1313a4a2ac8a8a477634fbae63cc6100e3aebb207ce61558"
 "checksum log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)" = "14b6052be84e6b71ab17edffc2eeabf5c2c3ae1fdb464aae35ac50c67a44e1f7"
 "checksum luminance 0.38.0 (registry+https://github.com/rust-lang/crates.io-index)" = "20a5ff8bdb29331980a9686ae18da865b1314aa5aa0da372417b85e90ba7af7c"
-"checksum luminance-derive 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "7dd42b6cfdbe08a26738a4aad20b126030b14bd618c082e9b2373e4bf98920aa"
+"checksum luminance-derive 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)" = "265977f33e48d911ff387df65836e2b8df7a8453b74739da191ad89c5359e2d9"
 "checksum luminance-glfw 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "72f1022037ad7fa1693e3571fb83fea51443b6a0a81a1efc7bcaba835e5fd44d"
 "checksum luminance-windowing 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c796dd7f672459aaf0afdaad3de3134735ea3b6467cf5762556dcc9f4ae4e01a"
 "checksum malloc_buf 0.0.6 (registry+https://github.com/rust-lang/crates.io-index)" = "62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb"
