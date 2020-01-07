@@ -1,6 +1,9 @@
 name: Rust
 
-on: [push]
+on:
+  push:
+    branches:
+    - master
 
 jobs:
   build:
@@ -14,7 +17,7 @@ jobs:
       uses: actions-rs/toolchain@v1
       with:
         profile: default
-        toolchain: nightly-2019-11-24
+        toolchain: nightly-2019-12-18
         override: true
     - name: Build
       run: cargo build --verbose
