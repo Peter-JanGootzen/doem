@@ -1,3 +1,4 @@
+use crate::data::AABB;
 use doem_math::vector_space::Vector3;
 use luminance::context::GraphicsContext;
 use luminance::tess::{Mode, Tess, TessBuilder, TessError};
@@ -55,9 +56,10 @@ impl ObjLoader {
         let mut max_z: Option<f32> = None;
 
         for object in objects.into_iter() {
+            println!("loading object {}", object.name);
+            println!("{} vertices in object", object.vertices.len());
+            println!("{} geometries in object", object.geometry.len());
             for geometry in object.geometry {
-                println!("loading {}", object.name);
-                println!("{} vertices", object.vertices.len());
                 println!("{} shapes", geometry.shapes.len());
 
                 // build up vertices; for this to work, we remove duplicated vertices by putting them in a
@@ -90,7 +92,7 @@ impl ObjLoader {
                             }
                         }
                     } else {
-                        return Err("unsupported non-triangle shape".to_owned());
+                        println!("unsupported non-triangle shape");
                     }
                 }
             }
@@ -119,6 +121,9 @@ impl ObjLoader {
             (*v.pos)[2] -= middle_point[2][0];
         }
         middle_point = Vector3::origin();
+
+        println!("{} total amount of vertices for obj file", vertices.len());
+        println!("{} total amount of indices for obj file", indices.len());
 
         Ok(Self {
             vertices,
@@ -153,6 +158,79 @@ impl ObjLoader {
                 }
             }
         }
+    }
+    pub fn generate_aabb<C>(aabb: &AABB, ctx: &mut C) -> Result<Tess, TessError>
+    where
+        C: GraphicsContext,
+    {
+        let mut aabb_vertices: Vec<Vertex> = Vec::new();
+
+        let color = VertexColor::new([0.0, 1.0, 0.0]);
+        let min_x = aabb.middle_point.data[0][0] - aabb.half_size[0][0];
+        let min_y = aabb.middle_point.data[1][0] - aabb.half_size[1][0];
+        let min_z = aabb.middle_point.data[2][0] - aabb.half_size[2][0];
+        let max_x = aabb.middle_point.data[0][0] + aabb.half_size[0][0];
+        let max_y = aabb.middle_point.data[1][0] + aabb.half_size[1][0];
+        let max_z = aabb.middle_point.data[2][0] + aabb.half_size[2][0];
+
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([min_x, min_y, min_z]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([max_x, min_y, min_z]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([min_x, max_y, min_z]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([min_x, min_y, max_z]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([max_x, max_y, min_z]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([min_x, max_y, max_z]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([max_x, min_y, max_z]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([max_x, max_y, max_z]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([0.0, 0.0, 0.0]),
+            color,
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([max_x * 2.0, 0.0, 0.0]),
+            color: VertexColor::new([1.0, 0.0, 0.0]),
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([0.0, max_y * 2.0, 0.0]),
+            color: VertexColor::new([0.0, 1.0, 0.0]),
+        });
+        aabb_vertices.push(Vertex {
+            pos: VertexPosition::new([0.0, 0.0, max_z * 2.0]),
+            color: VertexColor::new([0.0, 0.0, 1.0]),
+        });
+
+        let aabb_indices: Vec<VertexIndex> = vec![
+            0, 1, 0, 3, 0, 2, 1, 0, 1, 6, 1, 4, 6, 3, 6, 7, 3, 5, 2, 4, 2, 5, 7, 4, 7, 5, 8, 9, 8,
+            10, 8, 11,
+        ];
+        TessBuilder::new(ctx)
+            .set_mode(Mode::Line)
+            .add_vertices(aabb_vertices)
+            .set_indices(aabb_indices)
+            .build()
     }
 
     pub fn generate_aabb_tess<C>(&self, ctx: &mut C) -> Result<Tess, TessError>

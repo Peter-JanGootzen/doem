@@ -4,6 +4,7 @@ use crate::ecs::components::transform::Transform;
 use crate::ecs::resources::doem_events::DoemEvents;
 use crate::gl_common::{ShaderInterface, VertexSemantics};
 use crate::tess_manager::TessManager;
+use crate::obj_loader::ObjLoader;
 use doem_math::vector_space::{Matrix4, Vector3, PI};
 use luminance::context::GraphicsContext;
 use luminance::framebuffer::Framebuffer;
@@ -24,7 +25,7 @@ const FS: &str = include_str!("../../shaders/displacement-fs.glsl");
 
 const FOVY: f32 = PI / 2.0;
 const Z_NEAR: f32 = 0.1;
-const Z_FAR: f32 = 1000.;
+const Z_FAR: f32 = std::f32::MAX / 2.0 - 1.0;
 
 pub struct GLSystem {
     surface: Rc<RefCell<GlfwSurface>>,
@@ -32,6 +33,7 @@ pub struct GLSystem {
     tess_manager: TessManager,
     shader_program: Program<VertexSemantics, (), ShaderInterface>,
     should_quit: Arc<Mutex<bool>>,
+    draw_bounding_boxes: bool
 }
 
 impl GLSystem {
@@ -43,12 +45,14 @@ impl GLSystem {
                 .ignore_warnings();
         let surface = Rc::new(RefCell::new(surface));
         let tess_manager = TessManager::new(surface.clone());
+        let draw_bounding_boxes = false;
         Self {
             surface,
             back_buffer,
             tess_manager,
             shader_program,
             should_quit,
+            draw_bounding_boxes
         }
     }
 }
@@ -80,14 +84,39 @@ impl<'a> System<'a> for GLSystem {
         let view = view.expect("No View was found!");
 
         for s in (&mut shape).join() {
-            if let Shape::Unit { .. } = s {
-                *s = self.tess_manager.init_shape((*s).clone());
+            match s {
+                Shape::Unit { .. } => {
+                    *s = self.tess_manager.init_shape((*s).clone());
+                }
+                Shape::Init {
+                    bounding_box,
+                    bounding_box_tess_id,
+                    ..
+                } => {
+                    if self.draw_bounding_boxes {
+                        match bounding_box_tess_id {
+                            None => {
+                                let id = self.tess_manager.get_aabb_id(&bounding_box);
+                                *bounding_box_tess_id = Some(id);
+                            }
+                            Some(id) => {
+                                let tess = self.tess_manager.get_tess(*id);
+                                if tess.is_none() {
+                                    let id = self.tess_manager.get_aabb_id(&bounding_box);
+                                    *bounding_box_tess_id = Some(id);
+                                }
+                            }
+                            _ => ()
+                        }
+                    }
+                }
             }
         }
 
         let shader_program = &self.shader_program;
         let view = view;
         let tess_manager = &mut self.tess_manager;
+        let draw_bounding_boxes = &self.draw_bounding_boxes;
         self.surface.borrow_mut().pipeline_builder().pipeline(
             &self.back_buffer,
             &PipelineState::default(),
@@ -106,8 +135,8 @@ impl<'a> System<'a> for GLSystem {
                         for (s, t) in (&shape, &transform).join() {
                             if let Shape::Init {
                                 tess_id,
-                                bounding_box: _,
                                 bounding_box_tess_id,
+                                ..
                             } = s
                             {
                                 let translation = Matrix4::get_translation(&t.position);
@@ -120,9 +149,14 @@ impl<'a> System<'a> for GLSystem {
 
                                 let tess_ref = tess_manager.get_tess(*tess_id).unwrap();
                                 tess_gate.render(TessSlice::one_whole(tess_ref));
-                                let bounding_box_tess_ref =
-                                    tess_manager.get_tess(*bounding_box_tess_id).unwrap();
-                                tess_gate.render(TessSlice::one_whole(bounding_box_tess_ref));
+                                if *draw_bounding_boxes {
+                                    if let Some(id) = bounding_box_tess_id {
+                                        let bounding_box_tess_ref = tess_manager.get_tess(*id).unwrap();
+                                        tess_gate.render(TessSlice::one_whole(bounding_box_tess_ref));
+                                    } else {
+                                        println!("ERROR, we are drawing bounding boxes, but a shape doesn't have a bounding_box_tess_id");
+                                    }
+                                }
                             }
                         }
                     });
@@ -143,6 +177,10 @@ impl<'a> System<'a> for GLSystem {
                 }
                 WindowEvent::FramebufferSize(..) => {
                     resize = true;
+                }
+                WindowEvent::Key(Key::B, _, action, _)
+                if action == Action::Press || action == Action::Repeat => {
+                    self.draw_bounding_boxes = !self.draw_bounding_boxes;
                 }
                 e => {
                     (events.0).push(e);

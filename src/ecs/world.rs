@@ -8,6 +8,7 @@ use crate::ecs::components::pulsate::Pulsate;
 use crate::ecs::components::damage::Damage;
 use crate::ecs::components::health::Health;
 use crate::ecs::components::gun::Gun;
+use crate::ecs::components::thruster::Thruster;
 use specs::prelude::*;
 
 pub struct DoemWorld;
@@ -25,6 +26,7 @@ impl DoemWorld {
         world.register::<Health>();
         world.register::<Damage>();
         world.register::<Gun>();
+        world.register::<Thruster>();
 
         world
     }

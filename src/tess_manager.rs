@@ -1,5 +1,5 @@
 use crate::ecs::components::shape::Shape;
-use crate::ecs::components::shape::AABB;
+use crate::data::AABB;
 use crate::obj_loader::ObjLoader;
 use doem_math::vector_space::Vector3;
 use luminance::tess::Tess;
@@ -37,6 +37,13 @@ impl TessManager {
             None => None,
         }
     }
+    pub fn get_aabb_id(&mut self, aabb: &AABB) -> usize {
+        let tess = ObjLoader::generate_aabb(aabb, &mut *self.surface.borrow_mut()).unwrap();
+        self.tesselations.push(Some(tess));
+        let id = self.tesselations.len() - 1;
+        self.used.insert(id);
+        id
+    }
     pub fn end(&mut self) {
         for (id, tess) in self.tesselations.iter_mut().enumerate() {
             if !self.used.contains(&id) {
@@ -54,9 +61,6 @@ impl TessManager {
                 Some(shape) => (*shape).clone(),
                 None => {
                     let tesselation = ObjLoader::load(Path::new(&obj_path)).unwrap();
-                    let bouding_box_tesselation = tesselation
-                        .generate_aabb_tess(&mut *self.surface.borrow_mut())
-                        .unwrap();
                     let bounding_box = AABB {
                         middle_point: tesselation.middle_point.clone(),
                         half_size: Vector3::new_from_array([
@@ -70,13 +74,11 @@ impl TessManager {
                         .unwrap();
                     self.tesselations.push(Some(shape_tess));
                     let tess_id = self.tesselations.len() - 1;
-                    self.tesselations.push(Some(bouding_box_tesselation));
-                    let bounding_box_tess_id = self.tesselations.len() - 1;
 
                     let shape = Shape::Init {
                         tess_id,
                         bounding_box,
-                        bounding_box_tess_id,
+                        bounding_box_tess_id: None,
                     };
                     let shape_clone = shape.clone();
                     self.path_index.insert(obj_path, shape);

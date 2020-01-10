@@ -33,7 +33,7 @@ impl<'a> System<'a> for ShootSystem {
                     if *action == Action::Press || *action == Action::Repeat => {
                         to_add.push((
                             Shape::Unit {
-                                obj_path: consts::BULLET_OBJ_PATH.to_owned()
+                                obj_path: consts::BULLET_OBJ_PATH.to_owned(),
                             },
                             Damage {
                                 damage: shooter_g.damage

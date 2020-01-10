@@ -103,7 +103,6 @@ impl<'a> System<'a> for TransformationsSystem {
 impl TransformationsSystem {
     pub fn rotate_x(orientation: &Matrix4, shape: &Shape, angle: Scalar) -> Matrix4 {
         if let Shape::Init { bounding_box, .. } = shape {
-            println!("Rotating X with: {}rad", angle);
             let x = Vector4::new_from_array([
                 [bounding_box.middle_point[0][0] + bounding_box.half_size[0][0]],
                 [0.0],
@@ -117,7 +116,6 @@ impl TransformationsSystem {
     }
     pub fn rotate_y(orientation: &Matrix4, shape: &Shape, angle: Scalar) -> Matrix4 {
         if let Shape::Init { bounding_box, .. } = shape {
-            println!("Rotating Y with: {}rad", angle);
             let y = Vector4::new_from_array([
                 [0.0],
                 [bounding_box.middle_point[1][0] + bounding_box.half_size[1][0]],
@@ -131,7 +129,6 @@ impl TransformationsSystem {
     }
     pub fn rotate_z(orientation: &Matrix4, shape: &Shape, angle: Scalar) -> Matrix4 {
         if let Shape::Init { bounding_box, .. } = shape {
-            println!("Rotating Z with: {}rad", angle);
             let z = Vector4::new_from_array([
                 [0.0],
                 [0.0],

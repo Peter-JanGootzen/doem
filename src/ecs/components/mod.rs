@@ -8,3 +8,4 @@ pub mod transformable;
 pub mod damage;
 pub mod health;
 pub mod gun;
+pub mod thruster;
