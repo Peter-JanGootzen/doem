@@ -84,27 +84,27 @@ impl<'a> System<'a> for GLSystem {
         let view = view.expect("No View was found!");
 
         for s in (&mut shape).join() {
-            match s {
-                Shape::Unit { .. } => {
-                    *s = self.tess_manager.init_shape((*s).clone());
-                }
-                Shape::Init {
-                    bounding_box,
-                    bounding_box_tess_id,
-                    ..
-                } => {
-                    if self.draw_bounding_boxes {
-                        match bounding_box_tess_id {
-                            None => {
+            if let Shape::Unit { .. } = s {
+                *s = self.tess_manager.init_shape((*s).clone());
+            }
+
+            if let Shape::Init {
+                bounding_box,
+                bounding_box_tess_id,
+                ..
+            } = s
+            {
+                if self.draw_bounding_boxes {
+                    match bounding_box_tess_id {
+                        None => {
+                            let id = self.tess_manager.get_aabb_id(&bounding_box);
+                            *bounding_box_tess_id = Some(id);
+                        }
+                        Some(id) => {
+                            let tess = self.tess_manager.get_tess(*id);
+                            if tess.is_none() {
                                 let id = self.tess_manager.get_aabb_id(&bounding_box);
                                 *bounding_box_tess_id = Some(id);
-                            }
-                            Some(id) => {
-                                let tess = self.tess_manager.get_tess(*id);
-                                if tess.is_none() {
-                                    let id = self.tess_manager.get_aabb_id(&bounding_box);
-                                    *bounding_box_tess_id = Some(id);
-                                }
                             }
                         }
                     }
