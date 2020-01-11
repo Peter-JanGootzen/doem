@@ -1,14 +1,11 @@
-use specs::prelude::*;
 use crate::ecs::components::pulsate::Pulsate;
 use crate::ecs::components::transform::Transform;
+use specs::prelude::*;
 
 pub struct PulsateSystem;
 
 impl<'a> System<'a> for PulsateSystem {
-    type SystemData = (
-        WriteStorage<'a, Pulsate>,
-        WriteStorage<'a, Transform>
-    );
+    type SystemData = (WriteStorage<'a, Pulsate>, WriteStorage<'a, Transform>);
 
     fn run(&mut self, (mut pulsate, mut transform): Self::SystemData) {
         for (p, t) in (&mut pulsate, &mut transform).join() {
@@ -21,7 +18,8 @@ impl<'a> System<'a> for PulsateSystem {
                 } else {
                     t.scale = &t.scale + &p.speed;
                 }
-            } else { // Shrinking
+            } else {
+                // Shrinking
                 // It will become too small
                 if t.scale.sign_length() - p.speed.length() < p.min_scale.sign_length() {
                     t.scale = &p.min_scale - &(&p.min_scale - &(&t.scale - &p.speed));

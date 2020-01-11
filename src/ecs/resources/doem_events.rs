@@ -1,5 +1,4 @@
 use luminance_glfw::WindowEvent;
-use std::collections::HashSet;
 
 pub struct DoemEvents(pub Vec<WindowEvent>);
 

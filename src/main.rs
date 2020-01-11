@@ -1,26 +1,26 @@
-mod gl_common;
-mod obj_loader;
-mod ecs;
-mod tess_manager;
 mod consts;
 mod data;
+mod ecs;
+mod gl_common;
+mod obj_loader;
+mod tess_manager;
 
 #[macro_use]
 extern crate lazy_static;
 
-use crate::ecs::components::follow_camera::FollowCamera;
-use crate::ecs::components::physics::Physics;
-use crate::ecs::components::shape::Shape;
-use crate::ecs::components::transform::Transform;
-use crate::ecs::components::pulsate::Pulsate;
-use crate::ecs::components::transformable::Transformable;
 use crate::ecs::components::collider::Collider;
+use crate::ecs::components::follow_camera::FollowCamera;
 use crate::ecs::components::gun::Gun;
-use crate::ecs::components::thruster::Thruster;
 use crate::ecs::components::health::Health;
+use crate::ecs::components::physics::Physics;
+use crate::ecs::components::pulsate::Pulsate;
+use crate::ecs::components::shape::Shape;
+use crate::ecs::components::thruster::Thruster;
+use crate::ecs::components::transform::Transform;
+use crate::ecs::components::transformable::Transformable;
 use crate::ecs::dispatcher::DoemDispatcher;
 use crate::ecs::world::DoemWorld;
-use clap::{App, Arg};
+use clap::App;
 use doem_math::vector_space::{Matrix4, Vector3};
 use luminance_glfw::{GlfwSurface, Surface, WindowDim, WindowOpt};
 use specs::prelude::*;
@@ -68,7 +68,7 @@ fn start() {
         .with(Gun {
             damage: consts::STARSHIP_BULLET_DAMAGE,
             velocity: consts::STARSHIP_BULLET_VELOCITY.clone(),
-            despawn_bullet_on_impact: true
+            despawn_bullet_on_impact: true,
         })
         .build();
 
@@ -97,21 +97,19 @@ fn start() {
         .with(Pulsate {
             speed: consts::NONDESCRIPTCIRCLE_SPEED.clone(),
             current_direction: true,
-            min_scale: consts::NONDESCRIPTCIRCLE_MIN_SCALE.clone(), 
-            max_scale: consts::NONDESCRIPTCIRCLE_MAX_SCALE.clone(), 
+            min_scale: consts::NONDESCRIPTCIRCLE_MIN_SCALE.clone(),
+            max_scale: consts::NONDESCRIPTCIRCLE_MAX_SCALE.clone(),
         })
         .with(Collider {
-            half_size: Vector3::new_from_array([[1.0], [1.0], [1.0]]) 
+            half_size: Vector3::new_from_array([[1.0], [1.0], [1.0]]),
         })
-        .with(Health {
-            health: 100.0
-        })
+        .with(Health { health: 100.0 })
         .build();
 
     let mut dispatcher = DoemDispatcher::new(surface, should_quit.clone());
     dispatcher.setup(&mut world);
     'game_loop: loop {
-        dispatcher.dispatch(&mut world);
+        dispatcher.dispatch(&world);
         world.maintain();
         if *(*should_quit).lock().unwrap() {
             break 'game_loop;

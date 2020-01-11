@@ -4,7 +4,6 @@ use crate::ecs::components::transform::Transform;
 use crate::ecs::resources::doem_events::DoemEvents;
 use crate::gl_common::{ShaderInterface, VertexSemantics};
 use crate::tess_manager::TessManager;
-use crate::obj_loader::ObjLoader;
 use doem_math::vector_space::{Matrix4, Vector3, PI};
 use luminance::context::GraphicsContext;
 use luminance::framebuffer::Framebuffer;
@@ -25,7 +24,7 @@ const FS: &str = include_str!("../../shaders/displacement-fs.glsl");
 
 const FOVY: f32 = PI / 2.0;
 const Z_NEAR: f32 = 0.1;
-const Z_FAR: f32 = 100000.0;
+const Z_FAR: f32 = 100_000.0;
 
 pub struct GLSystem {
     surface: Rc<RefCell<GlfwSurface>>,
@@ -33,7 +32,7 @@ pub struct GLSystem {
     tess_manager: TessManager,
     shader_program: Program<VertexSemantics, (), ShaderInterface>,
     should_quit: Arc<Mutex<bool>>,
-    draw_bounding_boxes: bool
+    draw_bounding_boxes: bool,
 }
 
 impl GLSystem {
@@ -52,7 +51,7 @@ impl GLSystem {
             tess_manager,
             shader_program,
             should_quit,
-            draw_bounding_boxes
+            draw_bounding_boxes,
         }
     }
 }
@@ -78,7 +77,8 @@ impl<'a> System<'a> for GLSystem {
             let camera_at_origin_rotated = &t.orientation * &camera_at_origin.dimension_hop();
             let eye = &t.position + &camera_at_origin_rotated.dimension_hop();
             let look_at = &t.position;
-            let up = &t.orientation * &Vector3::new_from_array([[0.0], [1.0], [0.0]]).dimension_hop();
+            let up =
+                &t.orientation * &Vector3::new_from_array([[0.0], [1.0], [0.0]]).dimension_hop();
             view = Some(Matrix4::get_view(&eye, look_at, &up.dimension_hop()));
         }
         let view = view.expect("No View was found!");
@@ -106,7 +106,6 @@ impl<'a> System<'a> for GLSystem {
                                     *bounding_box_tess_id = Some(id);
                                 }
                             }
-                            _ => ()
                         }
                     }
                 }
@@ -178,7 +177,8 @@ impl<'a> System<'a> for GLSystem {
                     resize = true;
                 }
                 WindowEvent::Key(Key::B, _, action, _)
-                if action == Action::Press || action == Action::Repeat => {
+                    if action == Action::Press || action == Action::Repeat =>
+                {
                     self.draw_bounding_boxes = !self.draw_bounding_boxes;
                 }
                 e => {

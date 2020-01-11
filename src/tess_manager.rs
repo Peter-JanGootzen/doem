@@ -1,11 +1,10 @@
-use crate::ecs::components::shape::Shape;
 use crate::data::AABB;
+use crate::ecs::components::shape::Shape;
 use crate::obj_loader::ObjLoader;
 use doem_math::vector_space::Vector3;
 use luminance::tess::Tess;
 use luminance_glfw::GlfwSurface;
 use std::cell::RefCell;
-use std::collections::BTreeSet;
 use std::collections::HashMap;
 use std::path::Path;
 use std::rc::Rc;
@@ -37,14 +36,11 @@ impl TessManager {
     pub fn get_aabb_id(&mut self, aabb: &AABB) -> usize {
         let tess = ObjLoader::generate_aabb(aabb, &mut *self.surface.borrow_mut()).unwrap();
         self.tesselations.push(Some(tess));
-        let id = self.tesselations.len() - 1;
-        id
+        self.tesselations.len() - 1
     }
     pub fn init_shape(&mut self, shape: Shape) -> Shape {
         match shape {
-            Shape::Init { .. } => {
-                return shape;
-            }
+            Shape::Init { .. } => shape,
             Shape::Unit { obj_path } => match &self.path_index.get(&obj_path) {
                 Some(shape) => (*shape).clone(),
                 None => {
@@ -58,7 +54,7 @@ impl TessManager {
                         ]),
                     };
                     let shape_tess = tesselation
-                        .to_tess(&mut *self.surface.borrow_mut())
+                        .build_tess(&mut *self.surface.borrow_mut())
                         .unwrap();
                     self.tesselations.push(Some(shape_tess));
                     let tess_id = self.tesselations.len() - 1;

@@ -22,7 +22,7 @@ pub struct ObjLoader {
 type VertexIndex = u32;
 
 impl ObjLoader {
-    pub fn to_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError>
+    pub fn build_tess<C>(self, ctx: &mut C) -> Result<Tess, TessError>
     where
         C: GraphicsContext,
     {
@@ -65,7 +65,7 @@ impl ObjLoader {
                 // build up vertices; for this to work, we remove duplicated vertices by putting them in a
                 // map associating the vertex with its ID
                 let mut vertex_cache: HashMap<obj::VTNIndex, VertexIndex> = HashMap::new();
-                for (i, shape) in (&geometry.shapes).into_iter().enumerate() {
+                for (i, shape) in (&geometry.shapes).iter().enumerate() {
                     let color = i as f32 / geometry.shapes.len() as f32;
                     if let obj::Shape::Triangle(a, b, c) = shape {
                         for key in &[a, b, c] {
@@ -112,7 +112,7 @@ impl ObjLoader {
         let mut middle_point = Vector3::new_from_array([
             [min_x + x_half_size],
             [min_y + y_half_size],
-            [min_z + z_half_size]
+            [min_z + z_half_size],
         ]);
 
         for v in vertices.iter_mut() {
@@ -172,80 +172,6 @@ impl ObjLoader {
         let max_x = aabb.middle_point.data[0][0] + aabb.half_size[0][0];
         let max_y = aabb.middle_point.data[1][0] + aabb.half_size[1][0];
         let max_z = aabb.middle_point.data[2][0] + aabb.half_size[2][0];
-
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([min_x, min_y, min_z]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([max_x, min_y, min_z]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([min_x, max_y, min_z]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([min_x, min_y, max_z]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([max_x, max_y, min_z]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([min_x, max_y, max_z]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([max_x, min_y, max_z]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([max_x, max_y, max_z]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([0.0, 0.0, 0.0]),
-            color,
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([max_x * 2.0, 0.0, 0.0]),
-            color: VertexColor::new([1.0, 0.0, 0.0]),
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([0.0, max_y * 2.0, 0.0]),
-            color: VertexColor::new([0.0, 1.0, 0.0]),
-        });
-        aabb_vertices.push(Vertex {
-            pos: VertexPosition::new([0.0, 0.0, max_z * 2.0]),
-            color: VertexColor::new([0.0, 0.0, 1.0]),
-        });
-
-        let aabb_indices: Vec<VertexIndex> = vec![
-            0, 1, 0, 3, 0, 2, 1, 0, 1, 6, 1, 4, 6, 3, 6, 7, 3, 5, 2, 4, 2, 5, 7, 4, 7, 5, 8, 9, 8,
-            10, 8, 11,
-        ];
-        TessBuilder::new(ctx)
-            .set_mode(Mode::Line)
-            .add_vertices(aabb_vertices)
-            .set_indices(aabb_indices)
-            .build()
-    }
-
-    pub fn generate_aabb_tess<C>(&self, ctx: &mut C) -> Result<Tess, TessError>
-    where
-        C: GraphicsContext,
-    {
-        let mut aabb_vertices: Vec<Vertex> = Vec::new();
-
-        let color = VertexColor::new([0.0, 1.0, 0.0]);
-        let min_x = self.middle_point.data[0][0] - self.x_half_size;
-        let min_y = self.middle_point.data[1][0] - self.y_half_size;
-        let min_z = self.middle_point.data[2][0] - self.z_half_size;
-        let max_x = self.middle_point.data[0][0] + self.x_half_size;
-        let max_y = self.middle_point.data[1][0] + self.y_half_size;
-        let max_z = self.middle_point.data[2][0] + self.z_half_size;
 
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([min_x, min_y, min_z]),

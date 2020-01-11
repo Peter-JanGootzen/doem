@@ -1,2 +1,2 @@
-pub mod doem_events;
 pub mod collisions;
+pub mod doem_events;

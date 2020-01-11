@@ -1,7 +1,7 @@
 use crate::ecs::components::physics::Physics;
 use crate::ecs::components::transform::Transform;
+use doem_math::vector_space::Vector4;
 use specs::prelude::*;
-use doem_math::vector_space::{ Vector3, Vector4 };
 
 pub struct PhysicsSystem;
 

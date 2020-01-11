@@ -1,14 +1,15 @@
 use crate::ecs::components::collider::Collider;
+use crate::ecs::components::damage::Damage;
+use crate::ecs::components::despawn::Despawn;
 use crate::ecs::components::follow_camera::FollowCamera;
+use crate::ecs::components::gun::Gun;
+use crate::ecs::components::health::Health;
 use crate::ecs::components::physics::Physics;
+use crate::ecs::components::pulsate::Pulsate;
 use crate::ecs::components::shape::Shape;
+use crate::ecs::components::thruster::Thruster;
 use crate::ecs::components::transform::Transform;
 use crate::ecs::components::transformable::Transformable;
-use crate::ecs::components::pulsate::Pulsate;
-use crate::ecs::components::damage::Damage;
-use crate::ecs::components::health::Health;
-use crate::ecs::components::gun::Gun;
-use crate::ecs::components::thruster::Thruster;
 use specs::prelude::*;
 
 pub struct DoemWorld;
@@ -27,6 +28,7 @@ impl DoemWorld {
         world.register::<Damage>();
         world.register::<Gun>();
         world.register::<Thruster>();
+        world.register::<Despawn>();
 
         world
     }

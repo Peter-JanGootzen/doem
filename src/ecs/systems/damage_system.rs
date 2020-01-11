@@ -5,7 +5,7 @@ use specs::prelude::*;
 
 pub struct DamageSystem;
 
-impl<'a> System<'a> for DamageSystem { 
+impl<'a> System<'a> for DamageSystem {
     type SystemData = (
         Entities<'a>,
         Write<'a, Collisions>,
@@ -13,7 +13,7 @@ impl<'a> System<'a> for DamageSystem {
         WriteStorage<'a, Health>,
     );
 
-    fn run(&mut self, (mut entities, mut collisions, damage, mut health): Self::SystemData) {
+    fn run(&mut self, (entities, collisions, damage, mut health): Self::SystemData) {
         let mut to_kill: Vec<Entity> = Vec::new();
         for (ent1, ent2) in collisions.0.iter() {
             if let Some(damage_1) = damage.get(*ent1) {
@@ -45,8 +45,12 @@ impl<'a> System<'a> for DamageSystem {
             }
         }
         for e in &to_kill {
-            entities.delete(*e);
+            if let Err(..) = entities.delete(*e) {
+                println!(
+                    "Tried to delete and entity(id: {}) in DamageSystem, but this sadly failed",
+                    e.id()
+                );
+            }
         }
     }
-
 }

@@ -1,5 +1,5 @@
-use std::collections::BTreeSet;
 use specs::prelude::*;
+use std::collections::BTreeSet;
 
 pub struct Collisions(pub BTreeSet<(Entity, Entity)>);
 
