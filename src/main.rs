@@ -14,6 +14,7 @@ use crate::ecs::components::shape::Shape;
 use crate::ecs::components::transform::Transform;
 use crate::ecs::components::pulsate::Pulsate;
 use crate::ecs::components::transformable::Transformable;
+use crate::ecs::components::collider::Collider;
 use crate::ecs::components::gun::Gun;
 use crate::ecs::components::thruster::Thruster;
 use crate::ecs::dispatcher::DoemDispatcher;
@@ -96,6 +97,9 @@ fn start() {
             current_direction: true,
             min_scale: consts::NONDESCRIPTCIRCLE_MIN_SCALE.clone(), 
             max_scale: consts::NONDESCRIPTCIRCLE_MAX_SCALE.clone(), 
+        })
+        .with(Collider {
+            half_size: Vector3::new_from_array([[1.0], [1.0], [1.0]]) 
         })
         .build();
 
