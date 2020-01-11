@@ -26,7 +26,7 @@ impl<'a> System<'a> for ShootSystem {
 
     fn run(&mut self , (events, gun, entities, mut shape, mut damage, mut collider, mut transform, mut physics): Self::SystemData) {
         let mut to_add: Vec<(Shape, Damage, Collider, Transform, Physics)> = Vec::new();
-        for (shooter_t, shooter_p, shooter_g) in (&transform, &physics, &gun).join() {
+        for (ent, shooter_t, shooter_p, shooter_g) in (&*entities, &transform, &physics, &gun).join() {
             for event in &events.0 {
                match event {
                     WindowEvent::Key(Key::Space, _, action, _)
@@ -36,7 +36,9 @@ impl<'a> System<'a> for ShootSystem {
                                 obj_path: consts::BULLET_OBJ_PATH.to_owned(),
                             },
                             Damage {
-                                damage: shooter_g.damage
+                                damage: shooter_g.damage,
+                                despawn_entity_on_impact: shooter_g.despawn_bullet_on_impact,
+                                damage_dealer: ent
                             },
                             Collider {
                                 half_size: Vector3::new_from_array([

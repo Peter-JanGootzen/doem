@@ -13,7 +13,6 @@ use std::rc::Rc;
 pub struct TessManager {
     surface: Rc<RefCell<GlfwSurface>>,
     tesselations: Vec<Option<Tess>>,
-    used: BTreeSet<usize>,
     path_index: HashMap<String, Shape>,
 }
 
@@ -22,7 +21,6 @@ impl TessManager {
         Self {
             surface,
             tesselations: Vec::<Option<Tess>>::new(),
-            used: BTreeSet::<usize>::new(),
             path_index: HashMap::<String, Shape>::new(),
         }
     }
@@ -31,7 +29,6 @@ impl TessManager {
             return None;
         }
 
-        self.used.insert(id);
         match &self.tesselations[id] {
             Some(tess) => Some(&tess),
             None => None,
@@ -41,16 +38,7 @@ impl TessManager {
         let tess = ObjLoader::generate_aabb(aabb, &mut *self.surface.borrow_mut()).unwrap();
         self.tesselations.push(Some(tess));
         let id = self.tesselations.len() - 1;
-        self.used.insert(id);
         id
-    }
-    pub fn end(&mut self) {
-        for (id, tess) in self.tesselations.iter_mut().enumerate() {
-            if !self.used.contains(&id) {
-                *tess = None;
-            }
-        }
-        self.used = BTreeSet::<usize>::new();
     }
     pub fn init_shape(&mut self, shape: Shape) -> Shape {
         match shape {

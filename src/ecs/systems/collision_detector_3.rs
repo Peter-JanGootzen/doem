@@ -31,7 +31,7 @@ impl<'a> System<'a> for CollisionDetector3 {
                     if let Shape::Init { bounding_box, .. } = s2 {
                         bb2 = bounding_box;
                         if Self::square_overlaps(bb1, t1, bb2, t2) {
-                            collisions.0.insert((ent1.id(), ent2.id()));
+                            collisions.0.insert((ent1, ent2));
                         }
                     }
                 }

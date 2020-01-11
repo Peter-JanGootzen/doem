@@ -147,7 +147,7 @@ impl<'a> System<'a> for GLSystem {
                                     .transform
                                     .update(transform.transpose().copy_to_array());
 
-                                let tess_ref = tess_manager.get_tess(*tess_id).unwrap();
+                                let tess_ref = tess_manager.get_tess(*tess_id).expect("tess with tess_id could not be retreived");
                                 tess_gate.render(TessSlice::one_whole(tess_ref));
                                 if *draw_bounding_boxes {
                                     if let Some(id) = bounding_box_tess_id {
@@ -164,7 +164,6 @@ impl<'a> System<'a> for GLSystem {
             },
         );
 
-        tess_manager.end();
         self.surface.borrow_mut().swap_buffers();
 
         let mut resize = false;

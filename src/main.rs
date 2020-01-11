@@ -17,6 +17,7 @@ use crate::ecs::components::transformable::Transformable;
 use crate::ecs::components::collider::Collider;
 use crate::ecs::components::gun::Gun;
 use crate::ecs::components::thruster::Thruster;
+use crate::ecs::components::health::Health;
 use crate::ecs::dispatcher::DoemDispatcher;
 use crate::ecs::world::DoemWorld;
 use clap::{App, Arg};
@@ -66,7 +67,8 @@ fn start() {
         })
         .with(Gun {
             damage: consts::STARSHIP_BULLET_DAMAGE,
-            velocity: consts::STARSHIP_BULLET_VELOCITY.clone()
+            velocity: consts::STARSHIP_BULLET_VELOCITY.clone(),
+            despawn_bullet_on_impact: true
         })
         .build();
 
@@ -100,6 +102,9 @@ fn start() {
         })
         .with(Collider {
             half_size: Vector3::new_from_array([[1.0], [1.0], [1.0]]) 
+        })
+        .with(Health {
+            health: 100.0
         })
         .build();
 

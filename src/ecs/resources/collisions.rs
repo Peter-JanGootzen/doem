@@ -1,10 +1,10 @@
 use std::collections::BTreeSet;
-use specs::world::Index;
+use specs::prelude::*;
 
-pub struct Collisions(pub BTreeSet<(Index, Index)>);
+pub struct Collisions(pub BTreeSet<(Entity, Entity)>);
 
 impl Default for Collisions {
     fn default() -> Collisions {
-        Collisions(BTreeSet::<(Index, Index)>::new())
+        Collisions(BTreeSet::<(Entity, Entity)>::new())
     }
 }
