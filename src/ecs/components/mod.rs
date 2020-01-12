@@ -1,7 +1,7 @@
 pub mod collider;
 pub mod damage;
 pub mod despawn;
-pub mod follow_camera;
+pub mod camera;
 pub mod gun;
 pub mod health;
 pub mod physics;

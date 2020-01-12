@@ -8,6 +8,10 @@ use specs::prelude::*;
 
 pub struct TransformationsSystem;
 
+const MOVEMENT_SPEED: f32 = 5.0;
+const GROW_SPEED: f32 = 0.1;
+const ROTATION_SPEED: f32 = 0.05;
+
 impl<'a> System<'a> for TransformationsSystem {
     type SystemData = (
         Read<'a, DoemEvents>,
@@ -21,76 +25,72 @@ impl<'a> System<'a> for TransformationsSystem {
             for event in &events.0 {
                 match event {
                     WindowEvent::Key(Key::A, _, action, _)
-                    | WindowEvent::Key(Key::Left, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.position[2][0] += 0.010;
+                        t.position[2][0] += MOVEMENT_SPEED;
                     }
 
                     WindowEvent::Key(Key::D, _, action, _)
-                    | WindowEvent::Key(Key::Right, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.position[2][0] += -0.010;
+                        t.position[2][0] += -MOVEMENT_SPEED;
                     }
 
                     WindowEvent::Key(Key::W, _, action, _)
-                    | WindowEvent::Key(Key::Up, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.position.data[0][0] += -0.010;
+                        t.position.data[0][0] += -MOVEMENT_SPEED;
                     }
 
                     WindowEvent::Key(Key::S, _, action, _)
-                    | WindowEvent::Key(Key::Down, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.position.data[0][0] += 0.010;
+                        t.position.data[0][0] += MOVEMENT_SPEED;
                     }
 
-                    WindowEvent::Key(Key::K, _, action, _)
+                    WindowEvent::Key(Key::Equal, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.scale.data[0][0] += 0.1;
-                        t.scale.data[1][0] += 0.1;
-                        t.scale.data[2][0] += 0.1;
+                        t.scale.data[0][0] += GROW_SPEED;
+                        t.scale.data[1][0] += GROW_SPEED;
+                        t.scale.data[2][0] += GROW_SPEED;
                     }
-                    WindowEvent::Key(Key::J, _, action, _)
+                    WindowEvent::Key(Key::Minus, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.scale.data[0][0] -= 0.1;
-                        t.scale.data[1][0] -= 0.1;
-                        t.scale.data[2][0] -= 0.1;
+                        t.scale.data[0][0] -= GROW_SPEED;
+                        t.scale.data[1][0] -= GROW_SPEED;
+                        t.scale.data[2][0] -= GROW_SPEED;
                     }
                     WindowEvent::Key(Key::Q, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_y(&t.orientation, s, 0.05);
+                        t.orientation = Self::rotate_y(&t.orientation, s, ROTATION_SPEED);
                     }
                     WindowEvent::Key(Key::E, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_y(&t.orientation, s, -0.05);
+                        t.orientation = Self::rotate_y(&t.orientation, s, -ROTATION_SPEED);
                     }
                     WindowEvent::Key(Key::Z, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_x(&t.orientation, s, 0.05);
+                        t.orientation = Self::rotate_x(&t.orientation, s, ROTATION_SPEED);
                     }
                     WindowEvent::Key(Key::X, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_x(&t.orientation, s, -0.05);
+                        t.orientation = Self::rotate_x(&t.orientation, s, -ROTATION_SPEED);
                     }
-                    WindowEvent::Key(Key::T, _, action, _)
+                    WindowEvent::Key(Key::R, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_z(&t.orientation, s, 0.05);
+                        t.orientation = Self::rotate_z(&t.orientation, s, ROTATION_SPEED);
                     }
-                    WindowEvent::Key(Key::G, _, action, _)
+                    WindowEvent::Key(Key::F, _, action, _)
                         if *action == Action::Press || *action == Action::Repeat =>
                     {
-                        t.orientation = Self::rotate_z(&t.orientation, s, -0.05);
+                        t.orientation = Self::rotate_z(&t.orientation, s, -ROTATION_SPEED);
                     }
 
                     _ => (),

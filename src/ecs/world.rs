@@ -1,7 +1,7 @@
 use crate::ecs::components::collider::Collider;
 use crate::ecs::components::damage::Damage;
 use crate::ecs::components::despawn::Despawn;
-use crate::ecs::components::follow_camera::FollowCamera;
+use crate::ecs::components::camera::Camera;
 use crate::ecs::components::gun::Gun;
 use crate::ecs::components::health::Health;
 use crate::ecs::components::physics::Physics;
@@ -21,7 +21,7 @@ impl DoemWorld {
         world.register::<Physics>();
         world.register::<Collider>();
         world.register::<Shape>();
-        world.register::<FollowCamera>();
+        world.register::<Camera>();
         world.register::<Transformable>();
         world.register::<Pulsate>();
         world.register::<Health>();

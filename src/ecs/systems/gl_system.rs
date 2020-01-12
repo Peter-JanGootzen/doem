@@ -1,4 +1,4 @@
-use crate::ecs::components::follow_camera::FollowCamera;
+use crate::ecs::components::camera::Camera;
 use crate::ecs::components::shape::Shape;
 use crate::ecs::components::transform::Transform;
 use crate::ecs::resources::doem_events::DoemEvents;
@@ -61,7 +61,7 @@ impl<'a> System<'a> for GLSystem {
         Write<'a, DoemEvents>,
         WriteStorage<'a, Transform>,
         WriteStorage<'a, Shape>,
-        ReadStorage<'a, FollowCamera>,
+        ReadStorage<'a, Camera>,
     );
 
     fn run(&mut self, (mut events, transform, mut shape, camera): Self::SystemData) {
@@ -74,7 +74,7 @@ impl<'a> System<'a> for GLSystem {
         let mut view: Option<Matrix4> = None;
         for (t, c) in (&transform, &camera).join() {
             let camera_at_origin = &c.offset * c.zoom_level;
-            let camera_at_origin_rotated = &t.orientation * &camera_at_origin.dimension_hop();
+            let camera_at_origin_rotated = &(&t.orientation * &c.orientation) * &camera_at_origin.dimension_hop();
             let eye = &t.position + &camera_at_origin_rotated.dimension_hop();
             let look_at = &t.position;
             let up =

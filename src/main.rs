@@ -9,7 +9,7 @@ mod tess_manager;
 extern crate lazy_static;
 
 use crate::ecs::components::collider::Collider;
-use crate::ecs::components::follow_camera::FollowCamera;
+use crate::ecs::components::camera::Camera;
 use crate::ecs::components::gun::Gun;
 use crate::ecs::components::health::Health;
 use crate::ecs::components::physics::Physics;
@@ -61,9 +61,10 @@ fn start() {
             power: Vector3::new_from_array([[1.00], [0.0], [0.0]]),
         })
         .with(Transformable)
-        .with(FollowCamera {
+        .with(Camera {
             zoom_level: 10.0,
-            offset: Vector3::new_from_array([[20.0], [10.0], [0.0]]),
+            offset: Vector3::new_from_array([[20.0], [0.0], [0.0]]),
+            orientation: Matrix4::identity()
         })
         .with(Gun {
             damage: consts::STARSHIP_BULLET_DAMAGE,
