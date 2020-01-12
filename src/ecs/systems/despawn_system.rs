@@ -3,7 +3,7 @@ use crate::ecs::components::despawn::Despawn;
 use crate::ecs::components::shape::Shape;
 use crate::ecs::components::transform::Transform;
 use crate::ecs::systems::collision_detector_3::CollisionDetector3;
-use doem_math::vector_space::{Matrix4, Vector3};
+use doem_math::{Matrix4, Vector3};
 use specs::prelude::*;
 
 pub struct DespawnSystem;
@@ -20,7 +20,7 @@ impl<'a> System<'a> for DespawnSystem {
         let world_bounding_box = consts::WORLD_BOUNDING_BOX.clone();
         let world_transform = Transform {
             position: Vector3::origin(),
-            scale: Vector3::new_from_array([[1.0], [1.0], [1.0]]),
+            scale: Vector3::from([[1.0], [1.0], [1.0]]),
             orientation: Matrix4::identity(),
         };
         let mut to_kill: Vec<Entity> = Vec::new();

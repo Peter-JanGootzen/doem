@@ -1,4 +1,4 @@
-use doem_math::vector_space::Vector3;
+use doem_math::Vector3;
 
 #[derive(Clone)]
 pub struct AABB {

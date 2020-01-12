@@ -1,7 +1,7 @@
+pub mod camera;
 pub mod collider;
 pub mod damage;
 pub mod despawn;
-pub mod camera;
 pub mod gun;
 pub mod health;
 pub mod physics;

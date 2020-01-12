@@ -7,7 +7,7 @@ use crate::ecs::components::physics::Physics;
 use crate::ecs::components::shape::Shape;
 use crate::ecs::components::transform::Transform;
 use crate::ecs::resources::doem_events::DoemEvents;
-use doem_math::vector_space::Vector3;
+use doem_math::Vector3;
 use luminance_glfw::{Action, Key, WindowEvent};
 use specs::prelude::*;
 
@@ -59,7 +59,7 @@ impl<'a> System<'a> for ShootSystem {
                                 damage_dealer: ent,
                             },
                             Collider {
-                                half_size: Vector3::new_from_array([[0.0], [0.0], [0.0]]),
+                                half_size: Vector3::from([[0.0], [0.0], [0.0]]),
                             },
                             Transform {
                                 position: shooter_t.position.clone(),

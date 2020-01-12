@@ -1,7 +1,7 @@
 use crate::ecs::components::physics::Physics;
 use crate::ecs::components::thruster::Thruster;
 use crate::ecs::resources::doem_events::DoemEvents;
-use doem_math::vector_space::Vector3;
+use doem_math::Vector3;
 use luminance_glfw::{Action, Key, WindowEvent};
 use specs::prelude::*;
 
@@ -35,7 +35,7 @@ impl<'a> System<'a> for ThrusterSystem {
                     if *action == Action::Press || *action == Action::Repeat =>
                 {
                     for (p, _t) in (&mut physics, &thruster).join() {
-                        p.velocity = Vector3::new_from_array([[0.0], [0.0], [0.0]]);
+                        p.velocity = Vector3::from([[0.0], [0.0], [0.0]]);
                     }
                 }
                 _ => (),

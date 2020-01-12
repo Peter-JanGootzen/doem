@@ -1,4 +1,4 @@
-use doem_math::vector_space::{ Matrix4, Vector4, Scalar };
+use doem_math::{ Matrix4, Vector4, Scalar };
 use luminance::tess::Tess;
 
 pub struct Shape {
@@ -69,7 +69,7 @@ impl Shape {
         if xz != 0.0 {
             let new_x = x / xz;
             let new_z = z / xz;
-            m1 = Matrix4::new_from_array([
+            m1 = Matrix4::from([
                 [new_x, 0.0, new_z, 0.0],
                 [0.0, 1.0, 0.0, 0.0],
                 [-new_z, 0.0, new_x, 0.0],
@@ -81,7 +81,7 @@ impl Shape {
         let mut m2 = Matrix4::identity();
         let xyz = Scalar::sqrt(x.powi(2) + y.powi(2) + z.powi(2));
         if xyz != 0.0 {
-            m2 = Matrix4::new_from_array([
+            m2 = Matrix4::from([
                 [xz/xyz,         y/xyz,  0.0, 0.0],
                 [-1.0 * (y/xyz), xz/xyz, 0.0, 0.0],
                 [0.0, 0.0, 1.0, 0.0],
@@ -105,9 +105,9 @@ impl Shape {
         &(&(&(&m5 * &m4) * &m3) * &m2) * &m1
     }
     pub fn get_transformation(&self) -> Matrix4 {
-        //let mut x = Vector4::new_from_array([[self.middle_point[0][0] + self.x_half_size], [0.0], [0.0], [0.0]]);
-        //let mut y = Vector4::new_from_array([[0.0], [self.middle_point[1][0] + self.y_half_size], [0.0], [0.0]]);
-        //let mut z = Vector4::new_from_array([[0.0], [0.0], [self.middle_point[2][0] + self.z_half_size], [0.0]]);
+        //let mut x = Vector4::from([[self.middle_point[0][0] + self.x_half_size], [0.0], [0.0], [0.0]]);
+        //let mut y = Vector4::from([[0.0], [self.middle_point[1][0] + self.y_half_size], [0.0], [0.0]]);
+        //let mut z = Vector4::from([[0.0], [0.0], [self.middle_point[2][0] + self.z_half_size], [0.0]]);
 
         //let z_rotation = self.get_rotation_matrix(&z, self.rotation_angle_z);
         //x = &z_rotation * &x;
@@ -147,19 +147,19 @@ impl Shape {
     //}
     pub fn rotate_x(&mut self, angle: Scalar) {
         println!("Rotating X with: {}rad", angle);
-        let x = Vector4::new_from_array([[self.middle_point[0][0] + self.x_half_size], [0.0], [0.0], [0.0]]);
+        let x = Vector4::from([[self.middle_point[0][0] + self.x_half_size], [0.0], [0.0], [0.0]]);
         let x_norm = x.normalize();
         self.orientation = &self.orientation * &self.get_rotation_matrix(&x_norm, angle);
     }
     pub fn rotate_y(&mut self, angle: Scalar) {
         println!("Rotating Y with: {}rad", angle);
-        let y = Vector4::new_from_array([[0.0], [self.middle_point[1][0] + self.y_half_size], [0.0], [0.0]]);
+        let y = Vector4::from([[0.0], [self.middle_point[1][0] + self.y_half_size], [0.0], [0.0]]);
         let y_norm = y.normalize();
         self.orientation = &self.orientation * &self.get_rotation_matrix(&y_norm, angle);
     }
     pub fn rotate_z(&mut self, angle: Scalar) {
         println!("Rotating Z with: {}rad", angle);
-        let z = Vector4::new_from_array([[0.0], [0.0], [self.middle_point[2][0] + self.z_half_size], [0.0]]);
+        let z = Vector4::from([[0.0], [0.0], [self.middle_point[2][0] + self.z_half_size], [0.0]]);
         let z_norm = z.normalize();
         self.orientation = &self.orientation * &self.get_rotation_matrix(&z_norm, angle);
     }

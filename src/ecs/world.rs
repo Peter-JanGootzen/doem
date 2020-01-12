@@ -1,7 +1,7 @@
+use crate::ecs::components::camera::Camera;
 use crate::ecs::components::collider::Collider;
 use crate::ecs::components::damage::Damage;
 use crate::ecs::components::despawn::Despawn;
-use crate::ecs::components::camera::Camera;
 use crate::ecs::components::gun::Gun;
 use crate::ecs::components::health::Health;
 use crate::ecs::components::physics::Physics;

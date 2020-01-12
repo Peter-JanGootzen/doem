@@ -3,7 +3,7 @@ use crate::ecs::components::collider::Collider;
 use crate::ecs::components::shape::Shape;
 use crate::ecs::components::transform::Transform;
 use crate::ecs::resources::collisions::Collisions;
-use doem_math::vector_space::Matrix4;
+use doem_math::Matrix4;
 use specs::prelude::*;
 
 pub struct CollisionDetector3;

@@ -1,4 +1,4 @@
-use doem_math::vector_space::{Matrix4, Vector3};
+use doem_math::{Matrix4, Vector3};
 use specs::prelude::*;
 
 pub struct Transform {

@@ -1,5 +1,5 @@
 use crate::data::AABB;
-use doem_math::vector_space::Vector3;
+use doem_math::Vector3;
 use luminance::context::GraphicsContext;
 use luminance::tess::{Mode, Tess, TessBuilder, TessError};
 use std::collections::HashMap;
@@ -109,7 +109,7 @@ impl ObjLoader {
         let y_half_size = (max_y - min_y) / 2.0;
         let z_half_size = (max_z - min_z) / 2.0;
 
-        let mut middle_point = Vector3::new_from_array([
+        let mut middle_point = Vector3::from([
             [min_x + x_half_size],
             [min_y + y_half_size],
             [min_z + z_half_size],
@@ -166,12 +166,12 @@ impl ObjLoader {
         let mut aabb_vertices: Vec<Vertex> = Vec::new();
 
         let color = VertexColor::new([0.0, 1.0, 0.0]);
-        let min_x = aabb.middle_point.data[0][0] - aabb.half_size[0][0];
-        let min_y = aabb.middle_point.data[1][0] - aabb.half_size[1][0];
-        let min_z = aabb.middle_point.data[2][0] - aabb.half_size[2][0];
-        let max_x = aabb.middle_point.data[0][0] + aabb.half_size[0][0];
-        let max_y = aabb.middle_point.data[1][0] + aabb.half_size[1][0];
-        let max_z = aabb.middle_point.data[2][0] + aabb.half_size[2][0];
+        let min_x = aabb.middle_point[0][0] - aabb.half_size[0][0];
+        let min_y = aabb.middle_point[1][0] - aabb.half_size[1][0];
+        let min_z = aabb.middle_point[2][0] - aabb.half_size[2][0];
+        let max_x = aabb.middle_point[0][0] + aabb.half_size[0][0];
+        let max_y = aabb.middle_point[1][0] + aabb.half_size[1][0];
+        let max_z = aabb.middle_point[2][0] + aabb.half_size[2][0];
 
         aabb_vertices.push(Vertex {
             pos: VertexPosition::new([min_x, min_y, min_z]),

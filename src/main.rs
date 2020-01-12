@@ -8,8 +8,8 @@ mod tess_manager;
 #[macro_use]
 extern crate lazy_static;
 
-use crate::ecs::components::collider::Collider;
 use crate::ecs::components::camera::Camera;
+use crate::ecs::components::collider::Collider;
 use crate::ecs::components::gun::Gun;
 use crate::ecs::components::health::Health;
 use crate::ecs::components::physics::Physics;
@@ -21,7 +21,7 @@ use crate::ecs::components::transformable::Transformable;
 use crate::ecs::dispatcher::DoemDispatcher;
 use crate::ecs::world::DoemWorld;
 use clap::App;
-use doem_math::vector_space::{Matrix4, Vector3};
+use doem_math::{Matrix4, Vector3, PI};
 use luminance_glfw::{GlfwSurface, Surface, WindowDim, WindowOpt};
 use specs::prelude::*;
 use specs::WorldExt;
@@ -50,21 +50,21 @@ fn start() {
             obj_path: consts::STARSHIP_OBJ_PATH.to_owned(),
         })
         .with(Transform {
-            position: Vector3::new_from_array([[0.0], [30.0], [0.0]]),
-            scale: Vector3::new_from_array([[10.0], [10.0], [10.0]]),
-            orientation: Matrix4::identity(),
+            position: Vector3::from([[0.0], [200.0], [1000.0]]),
+            scale: Vector3::from([[10.0], [10.0], [10.0]]),
+            orientation: Matrix4::get_rotation_y(PI * 1.5),
         })
         .with(Physics {
-            velocity: Vector3::new_from_array([[0.00], [0.0], [0.0]]),
+            velocity: Vector3::from([[0.00], [0.0], [0.0]]),
         })
         .with(Thruster {
-            power: Vector3::new_from_array([[1.00], [0.0], [0.0]]),
+            power: Vector3::from([[1.00], [0.0], [0.0]]),
         })
         .with(Transformable)
         .with(Camera {
             zoom_level: 10.0,
-            offset: Vector3::new_from_array([[20.0], [0.0], [0.0]]),
-            orientation: Matrix4::identity()
+            offset: Vector3::from([[20.0], [10.0], [0.0]]),
+            orientation: Matrix4::identity(),
         })
         .with(Gun {
             damage: consts::STARSHIP_BULLET_DAMAGE,
@@ -79,8 +79,8 @@ fn start() {
             obj_path: consts::REFERENCEPLANE_OBJ_PATH.to_owned(),
         })
         .with(Transform {
-            position: Vector3::new_from_array([[1.0], [-3.0], [0.0]]),
-            scale: Vector3::new_from_array([[10.0], [1.0], [10.0]]),
+            position: Vector3::from([[1.0], [-3.0], [0.0]]),
+            scale: Vector3::from([[10.0], [1.0], [10.0]]),
             orientation: Matrix4::identity(),
         })
         .build();
@@ -91,7 +91,7 @@ fn start() {
             obj_path: consts::NONDESCRIPTCIRCLE_OBJ_PATH.to_owned(),
         })
         .with(Transform {
-            position: Vector3::new_from_array([[0.0], [700.0], [-500.0]]),
+            position: Vector3::from([[0.0], [700.0], [-500.0]]),
             scale: consts::NONDESCRIPTCIRCLE_SCALE.clone(),
             orientation: Matrix4::identity(),
         })
@@ -102,9 +102,43 @@ fn start() {
             max_scale: consts::NONDESCRIPTCIRCLE_MAX_SCALE.clone(),
         })
         .with(Collider {
-            half_size: Vector3::new_from_array([[1.0], [1.0], [1.0]]),
+            half_size: Vector3::from([[1.0], [1.0], [1.0]]),
         })
         .with(Health { health: 100.0 })
+        .build();
+
+    world
+        .create_entity()
+        .with(Shape::Unit {
+            obj_path: consts::DOEM_TITLE_OBJ_PATH.to_owned(),
+        })
+        .with(Transform {
+            position: Vector3::from([[-500.0], [0.0], [-700.0]]),
+            scale: Vector3::from([[10.0], [10.0], [10.0]]),
+            orientation: &Matrix4::get_rotation_x(PI * 0.5) * &Matrix4::get_rotation_z(PI * -0.25),
+        })
+        .build();
+    world
+        .create_entity()
+        .with(Shape::Unit {
+            obj_path: consts::DOEM_TITLE_OBJ_PATH.to_owned(),
+        })
+        .with(Transform {
+            position: Vector3::from([[1.0], [0.0], [-900.0]]),
+            scale: Vector3::from([[10.0], [10.0], [10.0]]),
+            orientation: Matrix4::get_rotation_x(PI * 0.5),
+        })
+        .build();
+    world
+        .create_entity()
+        .with(Shape::Unit {
+            obj_path: consts::DOEM_TITLE_OBJ_PATH.to_owned(),
+        })
+        .with(Transform {
+            position: Vector3::from([[500.0], [0.0], [-700.0]]),
+            scale: Vector3::from([[10.0], [10.0], [10.0]]),
+            orientation: &Matrix4::get_rotation_x(PI * 0.5) * &Matrix4::get_rotation_z(PI * 0.25),
+        })
         .build();
 
     let mut dispatcher = DoemDispatcher::new(surface, should_quit.clone());

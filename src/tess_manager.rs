@@ -1,7 +1,7 @@
 use crate::data::AABB;
 use crate::ecs::components::shape::Shape;
 use crate::obj_loader::ObjLoader;
-use doem_math::vector_space::Vector3;
+use doem_math::Vector3;
 use luminance::tess::Tess;
 use luminance_glfw::GlfwSurface;
 use std::cell::RefCell;
@@ -47,7 +47,7 @@ impl TessManager {
                     let tesselation = ObjLoader::load(Path::new(&obj_path)).unwrap();
                     let bounding_box = AABB {
                         middle_point: tesselation.middle_point.clone(),
-                        half_size: Vector3::new_from_array([
+                        half_size: Vector3::from([
                             [tesselation.x_half_size],
                             [tesselation.y_half_size],
                             [tesselation.z_half_size],

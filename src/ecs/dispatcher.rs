@@ -1,3 +1,4 @@
+use crate::ecs::systems::camera_system::CameraSystem;
 use crate::ecs::systems::collision_detector_3::CollisionDetector3;
 use crate::ecs::systems::damage_system::DamageSystem;
 use crate::ecs::systems::despawn_system::DespawnSystem;
@@ -7,7 +8,6 @@ use crate::ecs::systems::pulsate_system::PulsateSystem;
 use crate::ecs::systems::shoot_system::ShootSystem;
 use crate::ecs::systems::thruster_system::ThrusterSystem;
 use crate::ecs::systems::transformations_system::TransformationsSystem;
-use crate::ecs::systems::camera_system::CameraSystem;
 use luminance_glfw::GlfwSurface;
 use specs::prelude::*;
 use std::sync::Arc;

@@ -4,7 +4,7 @@ use crate::ecs::components::transform::Transform;
 use crate::ecs::resources::doem_events::DoemEvents;
 use crate::gl_common::{ShaderInterface, VertexSemantics};
 use crate::tess_manager::TessManager;
-use doem_math::vector_space::{Matrix4, Vector3, PI};
+use doem_math::{Matrix4, Vector3, PI};
 use luminance::context::GraphicsContext;
 use luminance::framebuffer::Framebuffer;
 use luminance::pipeline::PipelineState;
@@ -74,11 +74,11 @@ impl<'a> System<'a> for GLSystem {
         let mut view: Option<Matrix4> = None;
         for (t, c) in (&transform, &camera).join() {
             let camera_at_origin = &c.offset * c.zoom_level;
-            let camera_at_origin_rotated = &(&t.orientation * &c.orientation) * &camera_at_origin.dimension_hop();
+            let camera_at_origin_rotated =
+                &(&t.orientation * &c.orientation) * &camera_at_origin.dimension_hop();
             let eye = &t.position + &camera_at_origin_rotated.dimension_hop();
             let look_at = &t.position;
-            let up =
-                &t.orientation * &Vector3::new_from_array([[0.0], [1.0], [0.0]]).dimension_hop();
+            let up = &t.orientation * &Vector3::from([[0.0], [1.0], [0.0]]).dimension_hop();
             view = Some(Matrix4::get_view(&eye, look_at, &up.dimension_hop()));
         }
         let view = view.expect("No View was found!");
@@ -123,14 +123,14 @@ impl<'a> System<'a> for GLSystem {
                 shd_gate.shade(shader_program, |iface, mut rdr_gate| {
                     iface
                         .projection
-                        .update(projection.transpose().copy_to_array());
-                    iface.view.update(view.transpose().copy_to_array());
+                        .update(projection.transpose().into());
+                    iface.view.update(view.transpose().into());
 
                     rdr_gate.render(&RenderState::default(), |mut tess_gate| {
                         // Render all the tesselations with their transformations
                         iface
                             .transform
-                            .update(Matrix4::identity().transpose().copy_to_array());
+                            .update(Matrix4::identity().transpose().into());
                         for (s, t) in (&shape, &transform).join() {
                             if let Shape::Init {
                                 tess_id,
@@ -144,7 +144,7 @@ impl<'a> System<'a> for GLSystem {
                                 let transform = &translation * &(&t.orientation * &scaling);
                                 iface
                                     .transform
-                                    .update(transform.transpose().copy_to_array());
+                                    .update(transform.transpose().into());
 
                                 let tess_ref = tess_manager.get_tess(*tess_id).expect("tess with tess_id could not be retreived");
                                 tess_gate.render(TessSlice::one_whole(tess_ref));
