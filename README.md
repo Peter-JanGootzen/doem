@@ -1,6 +1,16 @@
-![nightly](https://camo.githubusercontent.com/07824dbc41d7b25e7a2041f9cfab3cc3609dd650/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f72757374632d6e696768746c792d6c69676874677261792e737667)
+[![Rust-nightly][ri]][rl]
+
+[ri]: https://img.shields.io/badge/rustc-nightly-lightgray.svg
+[rl]: https://www.rust-lang.org/
 
 # doem
+A simple 3D game built with [luminance](https://github.com/phaazon/luminance-rs), [SPECS](https://github.com/amethyst/specs) and our own math crate: [doem-math](https://github.com/Peter-JanGootzen/doem-math).
+
+Because doem-math was created with const generics, this repo needs Rust nightly to be built(tested uptill nightly 2020-01-08).
+
+[Video](https://youtu.be/_dJZUyysXX0)
+
+Made by Bram-Boris Meerlo and Peter-Jan Gootzen for our final linear algebra assessment.
 
 ## Keybindings
 
